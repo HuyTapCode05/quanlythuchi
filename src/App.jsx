@@ -29,8 +29,41 @@ export default function App() {
         updateCategory,
         deleteCategory,
         getByType,
-        getCategoryById
+        getCategoryById,
+        replaceAllCategories,
+        getCategoriesSnapshot
     } = useCategories()
+
+    const {
+        replaceAllTransactions,
+        getTransactionsSnapshot
+    } = useTransactions()
+
+    const handleExportData = () => {
+        const data = {
+            categories: getCategoriesSnapshot(),
+            transactions: getTransactionsSnapshot()
+        }
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'fintrack-data.json'
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+
+    const handleImportData = (data) => {
+        if (!data || typeof data !== 'object') return
+        if (Array.isArray(data.categories) || Array.isArray(data.transactions)) {
+            if (Array.isArray(data.categories)) {
+                replaceAllCategories(data.categories)
+            }
+            if (Array.isArray(data.transactions)) {
+                replaceAllTransactions(data.transactions)
+            }
+        }
+    }
 
     return (
         <Routes>
@@ -49,7 +82,14 @@ export default function App() {
 
             <Route
                 element={
-                    isAuthenticated ? <Layout /> : <Navigate to="/login" replace />
+                    isAuthenticated ? (
+                        <Layout
+                            onExportData={handleExportData}
+                            onImportData={handleImportData}
+                        />
+                    ) : (
+                        <Navigate to="/login" replace />
+                    )
                 }
             >
                 <Route

@@ -1,6 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
-
-const STORAGE_KEY = 'expense_tracker_categories'
+import { useState, useCallback } from 'react'
 
 const DEFAULT_CATEGORIES = [
     { id: '1', name: 'Ăn uống', color: '#ff6b6b', icon: '🍔', type: 'expense' },
@@ -20,25 +18,8 @@ const DEFAULT_CATEGORIES = [
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
 
-const loadFromStorage = () => {
-    try {
-        const data = localStorage.getItem(STORAGE_KEY)
-        return data ? JSON.parse(data) : DEFAULT_CATEGORIES
-    } catch {
-        return DEFAULT_CATEGORIES
-    }
-}
-
-const saveToStorage = (categories) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(categories))
-}
-
 export function useCategories() {
-    const [categories, setCategories] = useState(loadFromStorage)
-
-    useEffect(() => {
-        saveToStorage(categories)
-    }, [categories])
+    const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
 
     const addCategory = useCallback((data) => {
         const newCat = { id: generateId(), ...data }
@@ -56,6 +37,26 @@ export function useCategories() {
         setCategories(prev => prev.filter(cat => cat.id !== id))
     }, [])
 
+    const replaceAllCategories = useCallback((list) => {
+        if (!Array.isArray(list)) return
+        const safe = list
+            .filter(item => item && typeof item === 'object')
+            .map(item => ({
+                id: item.id || generateId(),
+                name: item.name || 'Chưa đặt tên',
+                color: item.color || '#9d9dba',
+                icon: item.icon || '📌',
+                type: item.type === 'income' ? 'income' : 'expense'
+            }))
+        setCategories(safe.length ? safe : DEFAULT_CATEGORIES)
+    }, [])
+
+    const resetDefaultCategories = useCallback(() => {
+        setCategories(DEFAULT_CATEGORIES)
+    }, [])
+
+    const getCategoriesSnapshot = useCallback(() => categories, [categories])
+
     const getByType = useCallback((type) => {
         return categories.filter(cat => cat.type === type)
     }, [categories])
@@ -69,6 +70,9 @@ export function useCategories() {
         addCategory,
         updateCategory,
         deleteCategory,
+        replaceAllCategories,
+        resetDefaultCategories,
+        getCategoriesSnapshot,
         getByType,
         getCategoryById
     }

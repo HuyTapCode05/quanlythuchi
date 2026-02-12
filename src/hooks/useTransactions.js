@@ -1,49 +1,39 @@
-import { useState, useEffect, useCallback } from 'react'
-
-const STORAGE_KEY = 'expense_tracker_transactions'
+import { useState, useCallback } from 'react'
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
 
-const loadFromStorage = () => {
-    try {
-        const data = localStorage.getItem(STORAGE_KEY)
-        return data ? JSON.parse(data) : []
-    } catch {
-        return []
-    }
-}
-
-const saveToStorage = (transactions) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
-}
-
 export function useTransactions() {
-    const [transactions, setTransactions] = useState(loadFromStorage)
-
-    useEffect(() => {
-        saveToStorage(transactions)
-    }, [transactions])
+    const [transactions, setTransactions] = useState([])
 
     const addTransaction = useCallback((data) => {
-        const newTx = {
+        const newTx = normalizeTransaction({
             id: generateId(),
             ...data,
-            amount: Math.abs(Number(data.amount)),
             createdAt: new Date().toISOString()
-        }
+        })
         setTransactions(prev => [newTx, ...prev])
         return newTx
     }, [])
 
     const updateTransaction = useCallback((id, data) => {
         setTransactions(prev =>
-            prev.map(tx => tx.id === id ? { ...tx, ...data, amount: Math.abs(Number(data.amount)) } : tx)
+            prev.map(tx => tx.id === id ? normalizeTransaction({ ...tx, ...data }) : tx)
         )
     }, [])
 
     const deleteTransaction = useCallback((id) => {
         setTransactions(prev => prev.filter(tx => tx.id !== id))
     }, [])
+
+    const replaceAllTransactions = useCallback((list) => {
+        if (!Array.isArray(list)) return
+        const safe = list
+            .filter(item => item && typeof item === 'object')
+            .map(item => normalizeTransaction(item))
+        setTransactions(safe)
+    }, [])
+
+    const getTransactionsSnapshot = useCallback(() => transactions, [transactions])
 
     const totalIncome = transactions
         .filter(tx => tx.type === 'income')
@@ -87,6 +77,8 @@ export function useTransactions() {
         addTransaction,
         updateTransaction,
         deleteTransaction,
+        replaceAllTransactions,
+        getTransactionsSnapshot,
         totalIncome,
         totalExpense,
         balance,

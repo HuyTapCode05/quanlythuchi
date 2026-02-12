@@ -1,0 +1,134 @@
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+/* Stats Grid */
+.dashboard__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+}
+
+/* Charts Grid */
+.dashboard__charts {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: var(--space-lg);
+}
+
+/* Pie Chart */
+.dashboard__pie-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.dashboard__pie-legend {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: 0 var(--space-sm);
+}
+
+.dashboard__pie-legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--fs-sm);
+    color: var(--text-primary);
+}
+
+.dashboard__pie-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Transaction List */
+.dashboard__tx-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard__tx-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-sm);
+    border-bottom: 1px solid var(--divider);
+    transition: background var(--transition-fast);
+}
+
+.dashboard__tx-item:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.dashboard__tx-item:last-child {
+    border-bottom: none;
+}
+
+.dashboard__tx-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.dashboard__tx-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.dashboard__tx-name {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--text-primary);
+}
+
+.dashboard__tx-meta {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.dashboard__tx-amount {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+    white-space: nowrap;
+}
+
+/* Chart tooltip */
+.chart-tooltip {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    font-size: var(--fs-xs);
+    box-shadow: var(--shadow-md);
+}
+
+.chart-tooltip__label {
+    color: var(--text-muted);
+    margin-bottom: var(--space-xs);
+    font-weight: var(--fw-semibold);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .dashboard__charts {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard__stats {
+        grid-template-columns: 1fr;
+    }
+}

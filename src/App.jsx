@@ -8,6 +8,7 @@ import { useCategories } from './hooks/useCategories'
 import { useAuth } from './hooks/useAuth'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
+import { exportToDB, importFromDB } from './utils/dbExport'
 
 export default function App() {
     const { isAuthenticated } = useAuth()
@@ -39,29 +40,37 @@ export default function App() {
         getTransactionsSnapshot
     } = useTransactions()
 
-    const handleExportData = () => {
-        const data = {
-            categories: getCategoriesSnapshot(),
-            transactions: getTransactionsSnapshot()
+    const handleExportData = async () => {
+        try {
+            const categories = getCategoriesSnapshot()
+            const transactions = getTransactionsSnapshot()
+            const dbData = await exportToDB(categories, transactions)
+            const blob = new Blob([dbData], { type: 'application/x-sqlite3' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = 'fintrack-data.db'
+            a.click()
+            URL.revokeObjectURL(url)
+            alert('Đã xuất file database thành công!')
+        } catch (error) {
+            console.error('Export error:', error)
+            alert('Lỗi khi xuất file database. Vui lòng thử lại.')
         }
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'fintrack-data.json'
-        a.click()
-        URL.revokeObjectURL(url)
     }
 
-    const handleImportData = (data) => {
-        if (!data || typeof data !== 'object') return
-        if (Array.isArray(data.categories) || Array.isArray(data.transactions)) {
-            if (Array.isArray(data.categories)) {
-                replaceAllCategories(data.categories)
+    const handleImportData = async (dbFile) => {
+        try {
+            const { categories, transactions } = await importFromDB(dbFile)
+            if (categories.length > 0) {
+                replaceAllCategories(categories)
             }
-            if (Array.isArray(data.transactions)) {
-                replaceAllTransactions(data.transactions)
+            if (transactions.length > 0) {
+                replaceAllTransactions(transactions)
             }
+        } catch (error) {
+            console.error('Import error:', error)
+            alert('Lỗi khi đọc file database. Vui lòng chọn đúng file .db từ FinTrack.')
         }
     }
 

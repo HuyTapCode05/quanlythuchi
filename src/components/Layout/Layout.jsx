@@ -37,19 +37,19 @@ export default function Layout({ onExportData, onImportData }) {
         const file = e.target.files?.[0]
         if (!file || !onImportData) return
         const reader = new FileReader()
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             try {
-                const text = event.target?.result
-                const json = JSON.parse(text)
-                onImportData(json)
-                alert('Đã import dữ liệu từ file JSON.')
-            } catch {
-                alert('File không hợp lệ, vui lòng chọn đúng file JSON từ FinTrack.')
+                const arrayBuffer = event.target?.result
+                await onImportData(arrayBuffer)
+                alert('Đã import dữ liệu từ file database.')
+            } catch (error) {
+                console.error('Import error:', error)
+                alert('File không hợp lệ, vui lòng chọn đúng file .db từ FinTrack.')
             } finally {
                 e.target.value = ''
             }
         }
-        reader.readAsText(file, 'utf-8')
+        reader.readAsArrayBuffer(file)
     }
 
     return (
@@ -86,17 +86,17 @@ export default function Layout({ onExportData, onImportData }) {
                                     style={{ marginRight: '8px' }}
                                     onClick={onExportData}
                                 >
-                                    Xuất JSON
+                                    Xuất DB
                                 </button>
                                 <button
                                     className="btn btn-ghost btn-sm"
                                     onClick={handleClickImport}
                                 >
-                                    Nhập JSON
+                                    Nhập DB
                                 </button>
                                 <input
                                     type="file"
-                                    accept="application/json"
+                                    accept=".db,application/x-sqlite3"
                                     ref={fileInputRef}
                                     style={{ display: 'none' }}
                                     onChange={handleFileChange}

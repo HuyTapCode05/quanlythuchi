@@ -40,10 +40,19 @@ export function useTransactions() {
     }
 
     const addTransaction = useCallback(async (data) => {
+        // Convert date to ISO string if provided
+        let createdAt = new Date().toISOString()
+        if (data.date) {
+            const dateObj = new Date(data.date)
+            dateObj.setHours(12, 0, 0, 0) // Set to noon to avoid timezone issues
+            createdAt = dateObj.toISOString()
+        }
+        
+        const { date, ...restData } = data
         const newTx = normalizeTransaction({
             id: generateId(),
-            ...data,
-            createdAt: new Date().toISOString()
+            ...restData,
+            createdAt
         })
         
         if (!user?.id) {
@@ -62,7 +71,19 @@ export function useTransactions() {
     }, [user?.id])
 
     const updateTransaction = useCallback(async (id, data) => {
-        const updated = normalizeTransaction({ ...data })
+        // Convert date to ISO string if provided
+        let createdAt = data.createdAt || new Date().toISOString()
+        if (data.date) {
+            const dateObj = new Date(data.date)
+            dateObj.setHours(12, 0, 0, 0)
+            createdAt = dateObj.toISOString()
+        }
+        
+        const { date, ...restData } = data
+        const updated = normalizeTransaction({ 
+            ...restData, 
+            createdAt 
+        })
         
         if (!user?.id) {
             setTransactions(prev =>

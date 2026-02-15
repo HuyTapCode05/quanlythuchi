@@ -150,10 +150,16 @@ app.get('/api/transactions/:userId', (req, res) => {
 app.post('/api/transactions', (req, res) => {
     try {
         const { id, type, amount, category, note, userId, createdAt } = req.body
+        
+        if (!id || !type || !amount || !userId || !createdAt) {
+            return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' })
+        }
+        
         const stmt = db.prepare('INSERT INTO transactions (id, type, amount, category, note, user_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
         stmt.run(id, type, amount, category || '', note || '', userId, createdAt)
-        res.json({ id, type, amount, category, note, createdAt })
+        res.json({ id, type, amount, category: category || '', note: note || '', createdAt })
     } catch (error) {
+        console.error('Add transaction error:', error)
         res.status(500).json({ error: error.message })
     }
 })

@@ -18,8 +18,10 @@ app.use(express.json())
 const dbPath = join(__dirname, 'fintrack.db')
 const db = new Database(dbPath)
 
-// Initialize tables
+// Initialize tables (without foreign keys for flexibility)
 db.exec(`
+    PRAGMA foreign_keys = OFF;
+    
     CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
@@ -35,8 +37,7 @@ db.exec(`
         icon TEXT,
         type TEXT NOT NULL,
         user_id TEXT,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS transactions (
@@ -46,9 +47,10 @@ db.exec(`
         category TEXT,
         note TEXT,
         user_id TEXT,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id)
+        created_at TEXT NOT NULL
     );
+    
+    PRAGMA foreign_keys = ON;
 `)
 
 // ===== USERS API =====
@@ -157,8 +159,13 @@ app.post('/api/transactions', (req, res) => {
             return res.status(400).json({ error: `Thiếu thông tin bắt buộc: id=${!!id}, type=${!!type}, amount=${amount !== undefined}, userId=${!!userId}, createdAt=${!!createdAt}` })
         }
         
+        // Temporarily disable foreign keys for insert
+        db.pragma('foreign_keys = OFF')
+        
         const stmt = db.prepare('INSERT INTO transactions (id, type, amount, category, note, user_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
         const result = stmt.run(id, type, Number(amount), category || '', note || '', userId, createdAt)
+        
+        db.pragma('foreign_keys = ON')
         
         if (result.changes === 0) {
             throw new Error('Không thể thêm giao dịch vào database')

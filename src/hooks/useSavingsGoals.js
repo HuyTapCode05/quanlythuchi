@@ -18,14 +18,22 @@ export function useSavingsGoals() {
     }, [user?.id])
 
     const loadGoals = useCallback(async () => {
-        if (!user?.id) return
+        if (!user?.id) {
+            setGoals([])
+            return
+        }
         try {
             setLoading(true)
             const data = await api.getSavingsGoals(user.id)
-            setGoals(data || [])
+            if (Array.isArray(data)) {
+                setGoals(data)
+            } else {
+                setGoals([])
+            }
         } catch (error) {
             console.error('Load savings goals error:', error)
-            setGoals([])
+            // Không reset về [] nếu có lỗi, giữ nguyên data cũ
+            // setGoals([])
         } finally {
             setLoading(false)
         }

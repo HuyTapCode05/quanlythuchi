@@ -214,10 +214,14 @@ const server = app.listen(PORT, () => {
 
 server.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
-        console.error(`❌ Port ${PORT} đã được sử dụng. Hãy dừng process khác hoặc đổi port.`)
+        console.error(`\n❌ Port ${PORT} đã được sử dụng!`)
+        console.error('💡 Hãy chạy lệnh sau để dừng process:')
+        console.error(`   taskkill /PID <PID> /F`)
+        console.error('   Hoặc tìm PID bằng: netstat -ano | findstr :3001')
     } else {
         console.error('❌ Server error:', error)
     }
+    db.close()
     process.exit(1)
 })
 

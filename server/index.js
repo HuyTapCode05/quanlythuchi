@@ -157,13 +157,12 @@ app.post('/api/transactions', (req, res) => {
             return res.status(400).json({ error: `Thiếu thông tin bắt buộc: id=${!!id}, type=${!!type}, amount=${amount !== undefined}, userId=${!!userId}, createdAt=${!!createdAt}` })
         }
         
-        // Disable foreign key check temporarily for flexibility
-        db.pragma('foreign_keys = OFF')
-        
         const stmt = db.prepare('INSERT INTO transactions (id, type, amount, category, note, user_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-        stmt.run(id, type, Number(amount), category || '', note || '', userId, createdAt)
+        const result = stmt.run(id, type, Number(amount), category || '', note || '', userId, createdAt)
         
-        db.pragma('foreign_keys = ON')
+        if (result.changes === 0) {
+            throw new Error('Không thể thêm giao dịch vào database')
+        }
         
         res.json({ id, type, amount: Number(amount), category: category || '', note: note || '', createdAt })
     } catch (error) {

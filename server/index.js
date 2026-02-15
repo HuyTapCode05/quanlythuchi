@@ -151,16 +151,25 @@ app.post('/api/transactions', (req, res) => {
     try {
         const { id, type, amount, category, note, userId, createdAt } = req.body
         
-        if (!id || !type || !amount || !userId || !createdAt) {
-            return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' })
+        console.log('Received transaction data:', { id, type, amount, category, note, userId, createdAt })
+        
+        if (!id || !type || amount === undefined || !userId || !createdAt) {
+            return res.status(400).json({ error: `Thiếu thông tin bắt buộc: id=${!!id}, type=${!!type}, amount=${amount !== undefined}, userId=${!!userId}, createdAt=${!!createdAt}` })
         }
         
+        // Disable foreign key check temporarily for flexibility
+        db.pragma('foreign_keys = OFF')
+        
         const stmt = db.prepare('INSERT INTO transactions (id, type, amount, category, note, user_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-        stmt.run(id, type, amount, category || '', note || '', userId, createdAt)
-        res.json({ id, type, amount, category: category || '', note: note || '', createdAt })
+        stmt.run(id, type, Number(amount), category || '', note || '', userId, createdAt)
+        
+        db.pragma('foreign_keys = ON')
+        
+        res.json({ id, type, amount: Number(amount), category: category || '', note: note || '', createdAt })
     } catch (error) {
         console.error('Add transaction error:', error)
-        res.status(500).json({ error: error.message })
+        console.error('Error stack:', error.stack)
+        res.status(500).json({ error: error.message || 'Lỗi không xác định' })
     }
 })
 

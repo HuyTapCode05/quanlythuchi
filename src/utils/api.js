@@ -76,7 +76,10 @@ export const api = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...transaction, userId })
         })
-        if (!res.ok) throw new Error('Lỗi khi thêm giao dịch')
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({ error: 'Lỗi khi thêm giao dịch' }))
+            throw new Error(error.error || 'Lỗi khi thêm giao dịch')
+        }
         return res.json()
     },
 

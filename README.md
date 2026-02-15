@@ -69,4 +69,16 @@ npm run build
 3. Từ lần sau, chỉ cần vào `/login` và dùng email + mật khẩu đã đăng ký.
 4. Nhấn vào avatar ở góc trên phải để **đăng xuất**.
 
+### 🌐 Deploy lên Web
+
+Xem file `DEPLOY.md` để biết hướng dẫn chi tiết deploy lên Vercel, Netlify, Railway, Render, v.v.
+
+**Nhanh nhất với Vercel:**
+1. Vào https://vercel.com
+2. Đăng nhập bằng GitHub
+3. Import repository `HuyTapCode05/quanlythuchi`
+4. Vercel tự động detect và deploy!
+
+**Lưu ý**: Backend cần deploy riêng trên Railway hoặc Render vì `better-sqlite3` cần native bindings.
+
 

@@ -9,13 +9,6 @@ export function useSavingsGoals() {
     const [goals, setGoals] = useState([])
     const [loading, setLoading] = useState(false)
 
-    useEffect(() => {
-        if (user?.id) {
-            loadGoals()
-        }
-        // Không reset về [] khi user chưa load xong, giữ nguyên data cũ
-    }, [user?.id, loadGoals])
-
     const normalizeGoal = (goal) => {
         return {
             id: goal.id,
@@ -53,6 +46,13 @@ export function useSavingsGoals() {
             setLoading(false)
         }
     }, [user?.id])
+
+    useEffect(() => {
+        if (user?.id) {
+            loadGoals()
+        }
+        // Không reset về [] khi user chưa load xong, giữ nguyên data cũ
+    }, [user?.id, loadGoals])
 
     const addGoal = useCallback(async (data) => {
         const newGoal = {

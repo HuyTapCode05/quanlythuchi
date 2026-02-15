@@ -142,6 +142,40 @@
   --shadow-glow-expense: 0 0 16px var(--expense-glow);
 }
 
+/* ===== LIGHT THEME SPECIFIC IMPROVEMENTS ===== */
+[data-theme="light"] .stat-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .stat-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .stat-card__label {
+  color: var(--text-primary);
+  font-weight: var(--fw-semibold);
+}
+
+[data-theme="light"] .stat-card__value {
+  color: var(--text-heading);
+  font-weight: var(--fw-extrabold);
+}
+
+[data-theme="light"] .stat-card.income .stat-card__icon {
+  background: var(--income-bg);
+  color: var(--income-color);
+}
+
+[data-theme="light"] .stat-card.expense .stat-card__icon {
+  background: var(--expense-bg);
+  color: var(--expense-color);
+}
+
+[data-theme="light"] .stat-card.balance .stat-card__icon {
+  background: rgba(95, 61, 196, 0.15);
+  color: var(--accent-primary);
+}
+
 /* ===== RESET & BASE ===== */
 *,
 *::before,
@@ -216,6 +250,14 @@ img {
   background: rgba(255, 255, 255, 0.2);
 }
 
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
 /* ===== ANIMATIONS ===== */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -283,15 +325,16 @@ img {
 
 /* ===== STAT CARD ===== */
 .stat-card {
-  background: rgba(30, 30, 66, 0.6);
+  background: var(--bg-card);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--space-xl);
   position: relative;
   overflow: hidden;
   transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
 }
 
 .stat-card::before {
@@ -308,10 +351,8 @@ img {
 
 .stat-card:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 
-    0 12px 32px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
 }
 
 .stat-card:hover::before {
@@ -354,7 +395,7 @@ img {
 }
 
 .stat-card.balance .stat-card__icon {
-  background: rgba(108, 92, 231, 0.12);
+  background: var(--accent-primary-glow);
   color: var(--accent-primary);
 }
 

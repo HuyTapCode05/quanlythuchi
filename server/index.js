@@ -376,10 +376,13 @@ app.delete('/api/recurring/:id', (req, res) => {
 app.get('/api/savings/:userId', (req, res) => {
     try {
         const { userId } = req.params
+        console.log('Loading savings goals for user:', userId)
         const stmt = db.prepare('SELECT * FROM savings_goals WHERE user_id = ? ORDER BY created_at DESC')
         const goals = stmt.all(userId)
+        console.log('Found goals:', goals.length)
         res.json(goals)
     } catch (error) {
+        console.error('Get savings goals error:', error)
         res.status(500).json({ error: error.message })
     }
 })
@@ -388,8 +391,10 @@ app.post('/api/savings', (req, res) => {
     try {
         const { id, name, targetAmount, currentAmount, targetDate, userId, isCompleted } = req.body
         
+        console.log('Received savings goal data:', { id, name, targetAmount, currentAmount, targetDate, userId, isCompleted })
+        
         if (!id || !name || !targetAmount || !userId) {
-            return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' })
+            return res.status(400).json({ error: `Thiếu thông tin bắt buộc: id=${!!id}, name=${!!name}, targetAmount=${!!targetAmount}, userId=${!!userId}` })
         }
         
         const stmt = db.prepare(`
@@ -402,6 +407,8 @@ app.post('/api/savings', (req, res) => {
             targetDate || null, userId, isCompleted !== undefined ? isCompleted : 0
         )
         
+        console.log('Insert result:', result)
+        
         if (result.changes === 0) {
             throw new Error('Không thể thêm mục tiêu tiết kiệm vào database')
         }
@@ -409,6 +416,7 @@ app.post('/api/savings', (req, res) => {
         res.json({ id, name, targetAmount: Number(targetAmount), currentAmount: Number(currentAmount || 0), targetDate, isCompleted })
     } catch (error) {
         console.error('Add savings goal error:', error)
+        console.error('Error stack:', error.stack)
         res.status(500).json({ error: error.message || 'Lỗi không xác định' })
     }
 })

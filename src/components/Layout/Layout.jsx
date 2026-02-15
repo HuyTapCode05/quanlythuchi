@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Menu, Search, Bell } from 'lucide-react'
+import { Menu, Search, Bell, Sun, Moon, Monitor } from 'lucide-react'
 import Sidebar from './Sidebar'
 import { useAuth } from '../../hooks/useAuth'
+import { useTheme } from '../../hooks/useTheme'
 import './Layout.css'
 
 const pageTitles = {
@@ -15,6 +16,7 @@ export default function Layout({ onExportData, onImportData }) {
     const [collapsed, setCollapsed] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
     const { user, logout } = useAuth()
+    const { theme, toggleTheme } = useTheme()
     const navigate = useNavigate()
     const fileInputRef = useRef(null)
     const location = useLocation()
@@ -79,6 +81,19 @@ export default function Layout({ onExportData, onImportData }) {
                                 className="layout__search-input"
                             />
                         </div>
+                        <button
+                            className="btn-icon btn-ghost layout__theme-toggle"
+                            onClick={toggleTheme}
+                            title={`Theme: ${theme === 'system' ? 'Hệ thống' : theme === 'dark' ? 'Tối' : 'Sáng'}`}
+                        >
+                            {theme === 'system' ? (
+                                <Monitor size={18} />
+                            ) : theme === 'dark' ? (
+                                <Moon size={18} />
+                            ) : (
+                                <Sun size={18} />
+                            )}
+                        </button>
                         {onExportData && (
                             <>
                                 <button

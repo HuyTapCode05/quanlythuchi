@@ -195,9 +195,39 @@ app.delete('/api/transactions/:id', (req, res) => {
     }
 })
 
+// Error handling
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error)
+    console.error('Stack:', error.stack)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason)
+})
+
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`)
     console.log(`📁 Database: ${dbPath}`)
+    console.log('✅ Server đã sẵn sàng nhận requests...')
+})
+
+server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} đã được sử dụng. Hãy dừng process khác hoặc đổi port.`)
+    } else {
+        console.error('❌ Server error:', error)
+    }
+    process.exit(1)
+})
+
+// Keep process alive
+process.on('SIGINT', () => {
+    console.log('\n🛑 Đang dừng server...')
+    server.close(() => {
+        db.close()
+        console.log('✅ Server đã dừng')
+        process.exit(0)
+    })
 })
 

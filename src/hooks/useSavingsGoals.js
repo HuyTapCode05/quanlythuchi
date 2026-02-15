@@ -102,8 +102,17 @@ export function useSavingsGoals() {
         const goal = goals.find(g => g.id === id)
         if (!goal) return
 
-        const newAmount = (goal.currentAmount || goal.current_amount || 0) + Number(amount)
-        await updateGoal(id, { ...goal, currentAmount: newAmount })
+        const current = goal.currentAmount || goal.current_amount || 0
+        const target = goal.targetAmount || goal.target_amount || 0
+        const newAmount = current + Number(amount)
+        
+        await updateGoal(id, { 
+            name: goal.name,
+            targetAmount: target,
+            currentAmount: newAmount,
+            targetDate: goal.targetDate || goal.target_date || null,
+            isCompleted: goal.isCompleted || goal.is_completed || 0
+        })
     }, [goals, updateGoal])
 
     return {

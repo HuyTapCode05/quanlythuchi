@@ -58,6 +58,21 @@ db.exec(`
         user_id TEXT NOT NULL,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS recurring_transactions (
+        id TEXT PRIMARY KEY,
+        type TEXT NOT NULL,
+        amount REAL NOT NULL,
+        category_id TEXT,
+        note TEXT,
+        frequency TEXT NOT NULL,
+        start_date TEXT NOT NULL,
+        end_date TEXT,
+        next_date TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        is_active INTEGER DEFAULT 1,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
     
     PRAGMA foreign_keys = ON;
 `)
@@ -266,6 +281,79 @@ app.delete('/api/budgets/:id', (req, res) => {
     try {
         const { id } = req.params
         const stmt = db.prepare('DELETE FROM budgets WHERE id = ?')
+        stmt.run(id)
+        res.json({ success: true })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+// ===== RECURRING TRANSACTIONS API =====
+app.get('/api/recurring/:userId', (req, res) => {
+    try {
+        const { userId } = req.params
+        const stmt = db.prepare('SELECT * FROM recurring_transactions WHERE user_id = ? ORDER BY created_at DESC')
+        const recurring = stmt.all(userId)
+        res.json(recurring)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.post('/api/recurring', (req, res) => {
+    try {
+        const { id, type, amount, categoryId, note, frequency, startDate, endDate, nextDate, userId, isActive } = req.body
+        
+        if (!id || !type || !amount || !frequency || !startDate || !nextDate || !userId) {
+            return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' })
+        }
+        
+        const stmt = db.prepare(`
+            INSERT INTO recurring_transactions 
+            (id, type, amount, category_id, note, frequency, start_date, end_date, next_date, user_id, is_active) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `)
+        const result = stmt.run(
+            id, type, Number(amount), categoryId || '', note || '', 
+            frequency, startDate, endDate || null, nextDate, userId, isActive !== undefined ? isActive : 1
+        )
+        
+        if (result.changes === 0) {
+            throw new Error('Không thể thêm giao dịch định kỳ vào database')
+        }
+        
+        res.json({ id, type, amount: Number(amount), categoryId, note, frequency, startDate, endDate, nextDate, isActive })
+    } catch (error) {
+        console.error('Add recurring error:', error)
+        res.status(500).json({ error: error.message || 'Lỗi không xác định' })
+    }
+})
+
+app.put('/api/recurring/:id', (req, res) => {
+    try {
+        const { id } = req.params
+        const { type, amount, categoryId, note, frequency, startDate, endDate, nextDate, isActive } = req.body
+        
+        const stmt = db.prepare(`
+            UPDATE recurring_transactions 
+            SET type = ?, amount = ?, category_id = ?, note = ?, frequency = ?, 
+                start_date = ?, end_date = ?, next_date = ?, is_active = ?
+            WHERE id = ?
+        `)
+        stmt.run(
+            type, Number(amount), categoryId || '', note || '', frequency,
+            startDate, endDate || null, nextDate, isActive !== undefined ? isActive : 1, id
+        )
+        res.json({ success: true })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.delete('/api/recurring/:id', (req, res) => {
+    try {
+        const { id } = req.params
+        const stmt = db.prepare('DELETE FROM recurring_transactions WHERE id = ?')
         stmt.run(id)
         res.json({ success: true })
     } catch (error) {

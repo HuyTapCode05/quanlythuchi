@@ -137,6 +137,44 @@ export const api = {
         })
         if (!res.ok) throw new Error('Lỗi khi xóa ngân sách')
         return res.json()
+    },
+
+    // Recurring Transactions
+    getRecurring: async (userId) => {
+        const res = await fetch(`${API_URL}/recurring/${userId}`)
+        if (!res.ok) throw new Error('Lỗi khi tải giao dịch định kỳ')
+        return res.json()
+    },
+
+    addRecurring: async (recurring, userId) => {
+        const res = await fetch(`${API_URL}/recurring`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...recurring, userId })
+        })
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({ error: 'Lỗi khi thêm giao dịch định kỳ' }))
+            throw new Error(error.error || 'Lỗi khi thêm giao dịch định kỳ')
+        }
+        return res.json()
+    },
+
+    updateRecurring: async (id, recurring) => {
+        const res = await fetch(`${API_URL}/recurring/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(recurring)
+        })
+        if (!res.ok) throw new Error('Lỗi khi cập nhật giao dịch định kỳ')
+        return res.json()
+    },
+
+    deleteRecurring: async (id) => {
+        const res = await fetch(`${API_URL}/recurring/${id}`, {
+            method: 'DELETE'
+        })
+        if (!res.ok) throw new Error('Lỗi khi xóa giao dịch định kỳ')
+        return res.json()
     }
 }
 

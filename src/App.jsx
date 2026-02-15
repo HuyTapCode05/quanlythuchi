@@ -3,11 +3,13 @@ import Layout from './components/Layout/Layout'
 import Dashboard from './pages/Dashboard/Dashboard'
 import Income from './pages/Income/Income'
 import Expense from './pages/Expense/Expense'
+import Recurring from './pages/Recurring/Recurring'
 import Budget from './pages/Budget/Budget'
 import Categories from './pages/Categories/Categories'
 import { useTransactions } from './hooks/useTransactions'
 import { useCategories } from './hooks/useCategories'
 import { useBudgets } from './hooks/useBudgets'
+import { useRecurringTransactions } from './hooks/useRecurringTransactions'
 import { useAuth } from './hooks/useAuth'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
@@ -44,6 +46,14 @@ export default function App() {
         updateBudget,
         deleteBudget
     } = useBudgets()
+
+    const {
+        recurring,
+        addRecurring,
+        updateRecurring,
+        deleteRecurring,
+        toggleActive
+    } = useRecurringTransactions()
 
     const {
         replaceAllTransactions,
@@ -146,6 +156,19 @@ export default function App() {
                             addTransaction={addTransaction}
                             updateTransaction={updateTransaction}
                             deleteTransaction={deleteTransaction}
+                        />
+                    }
+                />
+                <Route
+                    path="/recurring"
+                    element={
+                        <Recurring
+                            recurring={recurring}
+                            categories={categories}
+                            addRecurring={addRecurring}
+                            updateRecurring={updateRecurring}
+                            deleteRecurring={deleteRecurring}
+                            toggleActive={toggleActive}
                         />
                     }
                 />

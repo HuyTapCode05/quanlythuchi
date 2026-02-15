@@ -1,11 +1,12 @@
-import initSqlJs from 'sql.js'
-
 let SQL = null
 
 const initSQL = async () => {
     if (!SQL) {
+        // Dynamic import sql.js browser version
+        const sqlJsModule = await import('sql.js/dist/sql-wasm-browser.js')
+        const initSqlJs = sqlJsModule.default || sqlJsModule
         SQL = await initSqlJs({
-            locateFile: (file) => `https://sql.js.org/dist/${file}`
+            locateFile: (file) => `/sql-wasm.wasm`
         })
     }
     return SQL
@@ -13,6 +14,9 @@ const initSQL = async () => {
 
 export const exportToDB = async (categories, transactions) => {
     const SQL = await initSQL()
+    if (!SQL || !SQL.Database) {
+        throw new Error('SQL.js chưa được khởi tạo')
+    }
     const db = new SQL.Database()
 
     // Tạo bảng categories
@@ -73,6 +77,9 @@ export const exportToDB = async (categories, transactions) => {
 
 export const importFromDB = async (dbFile) => {
     const SQL = await initSQL()
+    if (!SQL || !SQL.Database) {
+        throw new Error('SQL.js chưa được khởi tạo')
+    }
     const uint8Array = new Uint8Array(dbFile)
     const db = new SQL.Database(uint8Array)
 

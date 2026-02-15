@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, Search, Pencil, Trash2, Filter } from 'lucide-react'
+import { Plus, Search, Pencil, Trash2, Filter, Calendar, X } from 'lucide-react'
 import Modal from '../../components/Modal'
 import TransactionForm from '../../components/TransactionForm'
 import { formatCurrency, formatDate } from '../../utils/helpers'
@@ -13,6 +13,8 @@ export default function Transactions({ transactions, categories, addTransaction,
     const [search, setSearch] = useState('')
     const [filterType, setFilterType] = useState('all')
     const [filterCat, setFilterCat] = useState('all')
+    const [dateFrom, setDateFrom] = useState('')
+    const [dateTo, setDateTo] = useState('')
     const [page, setPage] = useState(1)
 
     const getCat = (id) => categories.find(c => c.id === id)
@@ -28,9 +30,26 @@ export default function Transactions({ transactions, categories, addTransaction,
                 const matchCat = cat?.name?.toLowerCase().includes(s)
                 if (!matchNote && !matchCat) return false
             }
+            // Filter by date range
+            if (dateFrom || dateTo) {
+                const txDate = new Date(tx.createdAt)
+                txDate.setHours(0, 0, 0, 0)
+                
+                if (dateFrom) {
+                    const fromDate = new Date(dateFrom)
+                    fromDate.setHours(0, 0, 0, 0)
+                    if (txDate < fromDate) return false
+                }
+                
+                if (dateTo) {
+                    const toDate = new Date(dateTo)
+                    toDate.setHours(23, 59, 59, 999)
+                    if (txDate > toDate) return false
+                }
+            }
             return true
         })
-    }, [transactions, filterType, filterCat, search, categories])
+    }, [transactions, filterType, filterCat, search, dateFrom, dateTo, categories])
 
     const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
     const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
@@ -54,6 +73,42 @@ export default function Transactions({ transactions, categories, addTransaction,
         if (confirm('Bạn có chắc muốn xóa giao dịch này?')) {
             deleteTransaction(id)
         }
+    }
+
+    const setDatePreset = (preset) => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        
+        switch (preset) {
+            case 'today':
+                const todayStr = today.toISOString().split('T')[0]
+                setDateFrom(todayStr)
+                setDateTo(todayStr)
+                break
+            case 'week':
+                const weekStart = new Date(today)
+                weekStart.setDate(today.getDate() - today.getDay())
+                setDateFrom(weekStart.toISOString().split('T')[0])
+                setDateTo(today.toISOString().split('T')[0])
+                break
+            case 'month':
+                const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+                setDateFrom(monthStart.toISOString().split('T')[0])
+                setDateTo(today.toISOString().split('T')[0])
+                break
+            case 'year':
+                const yearStart = new Date(today.getFullYear(), 0, 1)
+                setDateFrom(yearStart.toISOString().split('T')[0])
+                setDateTo(today.toISOString().split('T')[0])
+                break
+            case 'clear':
+                setDateFrom('')
+                setDateTo('')
+                break
+            default:
+                break
+        }
+        setPage(1)
     }
 
     return (
@@ -92,6 +147,63 @@ export default function Transactions({ transactions, categories, addTransaction,
                             <option key={cat.id} value={cat.id}>{cat.icon} {cat.name}</option>
                         ))}
                     </select>
+
+                    {/* Date Range Filter */}
+                    <div className="transactions__date-filter">
+                        <Calendar size={16} className="transactions__date-icon" />
+                        <input
+                            type="date"
+                            className="form-input transactions__date-input"
+                            value={dateFrom}
+                            onChange={e => { setDateFrom(e.target.value); setPage(1) }}
+                            placeholder="Từ ngày"
+                        />
+                        <span className="transactions__date-separator">→</span>
+                        <input
+                            type="date"
+                            className="form-input transactions__date-input"
+                            value={dateTo}
+                            onChange={e => { setDateTo(e.target.value); setPage(1) }}
+                            placeholder="Đến ngày"
+                        />
+                        {(dateFrom || dateTo) && (
+                            <button
+                                className="btn-icon btn-ghost transactions__date-clear"
+                                onClick={() => setDatePreset('clear')}
+                                title="Xóa lọc ngày"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Quick Date Presets */}
+                    <div className="transactions__date-presets">
+                        <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={() => setDatePreset('today')}
+                        >
+                            Hôm nay
+                        </button>
+                        <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={() => setDatePreset('week')}
+                        >
+                            Tuần này
+                        </button>
+                        <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={() => setDatePreset('month')}
+                        >
+                            Tháng này
+                        </button>
+                        <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={() => setDatePreset('year')}
+                        >
+                            Năm này
+                        </button>
+                    </div>
                 </div>
 
                 <button className="btn btn-primary" onClick={() => { setEditTx(null); setShowModal(true) }}>
@@ -181,9 +293,9 @@ export default function Transactions({ transactions, categories, addTransaction,
                 <div className="table-container">
                     <div className="empty-state">
                         <div className="empty-state__icon"><Filter size={28} /></div>
-                        <p className="empty-state__title">{search || filterType !== 'all' || filterCat !== 'all' ? 'Không tìm thấy giao dịch' : 'Chưa có giao dịch nào'}</p>
-                        <p className="empty-state__desc">{search || filterType !== 'all' || filterCat !== 'all' ? 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.' : 'Nhấn nút "Thêm mới" để bắt đầu ghi nhận.'}</p>
-                        {!search && filterType === 'all' && filterCat === 'all' && (
+                        <p className="empty-state__title">{search || filterType !== 'all' || filterCat !== 'all' || dateFrom || dateTo ? 'Không tìm thấy giao dịch' : 'Chưa có giao dịch nào'}</p>
+                        <p className="empty-state__desc">{search || filterType !== 'all' || filterCat !== 'all' || dateFrom || dateTo ? 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.' : 'Nhấn nút "Thêm mới" để bắt đầu ghi nhận.'}</p>
+                        {!search && filterType === 'all' && filterCat === 'all' && !dateFrom && !dateTo && (
                             <button className="btn btn-primary" onClick={() => setShowModal(true)}>
                                 <Plus size={16} /> Thêm giao dịch
                             </button>

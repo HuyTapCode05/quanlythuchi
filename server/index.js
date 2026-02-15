@@ -73,6 +73,17 @@ db.exec(`
         is_active INTEGER DEFAULT 1,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS savings_goals (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        target_amount REAL NOT NULL,
+        current_amount REAL DEFAULT 0,
+        target_date TEXT,
+        user_id TEXT NOT NULL,
+        is_completed INTEGER DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
     
     PRAGMA foreign_keys = ON;
 `)
@@ -354,6 +365,78 @@ app.delete('/api/recurring/:id', (req, res) => {
     try {
         const { id } = req.params
         const stmt = db.prepare('DELETE FROM recurring_transactions WHERE id = ?')
+        stmt.run(id)
+        res.json({ success: true })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+// ===== SAVINGS GOALS API =====
+app.get('/api/savings/:userId', (req, res) => {
+    try {
+        const { userId } = req.params
+        const stmt = db.prepare('SELECT * FROM savings_goals WHERE user_id = ? ORDER BY created_at DESC')
+        const goals = stmt.all(userId)
+        res.json(goals)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.post('/api/savings', (req, res) => {
+    try {
+        const { id, name, targetAmount, currentAmount, targetDate, userId, isCompleted } = req.body
+        
+        if (!id || !name || !targetAmount || !userId) {
+            return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' })
+        }
+        
+        const stmt = db.prepare(`
+            INSERT INTO savings_goals 
+            (id, name, target_amount, current_amount, target_date, user_id, is_completed) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `)
+        const result = stmt.run(
+            id, name, Number(targetAmount), Number(currentAmount || 0), 
+            targetDate || null, userId, isCompleted !== undefined ? isCompleted : 0
+        )
+        
+        if (result.changes === 0) {
+            throw new Error('Không thể thêm mục tiêu tiết kiệm vào database')
+        }
+        
+        res.json({ id, name, targetAmount: Number(targetAmount), currentAmount: Number(currentAmount || 0), targetDate, isCompleted })
+    } catch (error) {
+        console.error('Add savings goal error:', error)
+        res.status(500).json({ error: error.message || 'Lỗi không xác định' })
+    }
+})
+
+app.put('/api/savings/:id', (req, res) => {
+    try {
+        const { id } = req.params
+        const { name, targetAmount, currentAmount, targetDate, isCompleted } = req.body
+        
+        const stmt = db.prepare(`
+            UPDATE savings_goals 
+            SET name = ?, target_amount = ?, current_amount = ?, target_date = ?, is_completed = ?
+            WHERE id = ?
+        `)
+        stmt.run(
+            name, Number(targetAmount), Number(currentAmount || 0), 
+            targetDate || null, isCompleted !== undefined ? isCompleted : 0, id
+        )
+        res.json({ success: true })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.delete('/api/savings/:id', (req, res) => {
+    try {
+        const { id } = req.params
+        const stmt = db.prepare('DELETE FROM savings_goals WHERE id = ?')
         stmt.run(id)
         res.json({ success: true })
     } catch (error) {

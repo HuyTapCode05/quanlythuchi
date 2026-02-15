@@ -5,11 +5,13 @@ import Income from './pages/Income/Income'
 import Expense from './pages/Expense/Expense'
 import Recurring from './pages/Recurring/Recurring'
 import Budget from './pages/Budget/Budget'
+import Savings from './pages/Savings/Savings'
 import Categories from './pages/Categories/Categories'
 import { useTransactions } from './hooks/useTransactions'
 import { useCategories } from './hooks/useCategories'
 import { useBudgets } from './hooks/useBudgets'
 import { useRecurringTransactions } from './hooks/useRecurringTransactions'
+import { useSavingsGoals } from './hooks/useSavingsGoals'
 import { useAuth } from './hooks/useAuth'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
@@ -54,6 +56,14 @@ export default function App() {
         deleteRecurring,
         toggleActive
     } = useRecurringTransactions()
+
+    const {
+        goals: savingsGoals,
+        addGoal: addSavingsGoal,
+        updateGoal: updateSavingsGoal,
+        deleteGoal: deleteSavingsGoal,
+        addToGoal: addToSavingsGoal
+    } = useSavingsGoals()
 
     const {
         replaceAllTransactions,
@@ -182,6 +192,18 @@ export default function App() {
                             addBudget={addBudget}
                             updateBudget={updateBudget}
                             deleteBudget={deleteBudget}
+                        />
+                    }
+                />
+                <Route
+                    path="/savings"
+                    element={
+                        <Savings
+                            goals={savingsGoals}
+                            addGoal={addSavingsGoal}
+                            updateGoal={updateSavingsGoal}
+                            deleteGoal={deleteSavingsGoal}
+                            addToGoal={addToSavingsGoal}
                         />
                     }
                 />

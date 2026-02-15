@@ -175,6 +175,44 @@ export const api = {
         })
         if (!res.ok) throw new Error('Lỗi khi xóa giao dịch định kỳ')
         return res.json()
+    },
+
+    // Savings Goals
+    getSavingsGoals: async (userId) => {
+        const res = await fetch(`${API_URL}/savings/${userId}`)
+        if (!res.ok) throw new Error('Lỗi khi tải mục tiêu tiết kiệm')
+        return res.json()
+    },
+
+    addSavingsGoal: async (goal, userId) => {
+        const res = await fetch(`${API_URL}/savings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...goal, userId })
+        })
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({ error: 'Lỗi khi thêm mục tiêu tiết kiệm' }))
+            throw new Error(error.error || 'Lỗi khi thêm mục tiêu tiết kiệm')
+        }
+        return res.json()
+    },
+
+    updateSavingsGoal: async (id, goal) => {
+        const res = await fetch(`${API_URL}/savings/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(goal)
+        })
+        if (!res.ok) throw new Error('Lỗi khi cập nhật mục tiêu tiết kiệm')
+        return res.json()
+    },
+
+    deleteSavingsGoal: async (id) => {
+        const res = await fetch(`${API_URL}/savings/${id}`, {
+            method: 'DELETE'
+        })
+        if (!res.ok) throw new Error('Lỗi khi xóa mục tiêu tiết kiệm')
+        return res.json()
     }
 }
 

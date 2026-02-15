@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import {
     LayoutDashboard, TrendingUp, TrendingDown, Tag, ChevronLeft,
-    ChevronRight, Wallet, Target, Repeat
+    ChevronRight, Wallet, Target, Repeat, PiggyBank
 } from 'lucide-react'
 import './Sidebar.css'
 
@@ -11,6 +11,7 @@ const menuItems = [
     { path: '/expense', icon: TrendingDown, label: 'Chi tiêu' },
     { path: '/recurring', icon: Repeat, label: 'Định kỳ' },
     { path: '/budget', icon: Target, label: 'Ngân sách' },
+    { path: '/savings', icon: PiggyBank, label: 'Tiết kiệm' },
     { path: '/categories', icon: Tag, label: 'Danh mục' },
 ]
 

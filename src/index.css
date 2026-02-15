@@ -95,48 +95,48 @@
 
 /* ===== LIGHT THEME ===== */
 [data-theme="light"] {
-  /* Colors - Light Theme */
-  --bg-primary: #f5f7fa;
+  /* Colors - Light Theme (Improved Contrast) */
+  --bg-primary: #f8f9fa;
   --bg-secondary: #ffffff;
   --bg-card: #ffffff;
-  --bg-card-hover: #f8f9fb;
+  --bg-card-hover: #f1f3f5;
   --bg-sidebar: #ffffff;
-  --bg-input: #f5f7fa;
-  --bg-modal-overlay: rgba(0, 0, 0, 0.4);
+  --bg-input: #f1f3f5;
+  --bg-modal-overlay: rgba(0, 0, 0, 0.5);
 
-  --text-primary: #2d3748;
-  --text-secondary: #718096;
-  --text-muted: #a0aec0;
-  --text-heading: #1a202c;
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-muted: #868e96;
+  --text-heading: #000000;
 
-  --accent-primary: #6c5ce7;
-  --accent-primary-hover: #5a4dd4;
-  --accent-primary-glow: rgba(108, 92, 231, 0.2);
-  --accent-secondary: #00cec9;
-  --accent-secondary-glow: rgba(0, 206, 201, 0.15);
+  --accent-primary: #5f3dc4;
+  --accent-primary-hover: #4c2fa3;
+  --accent-primary-glow: rgba(95, 61, 196, 0.25);
+  --accent-secondary: #00a8a8;
+  --accent-secondary-glow: rgba(0, 168, 168, 0.2);
 
-  --income-color: #00b894;
-  --income-bg: rgba(0, 184, 148, 0.1);
-  --income-glow: rgba(0, 184, 148, 0.2);
-  --income-color-light: #00d4a3;
-  --expense-color: #ff6b6b;
-  --expense-bg: rgba(255, 107, 107, 0.1);
-  --expense-glow: rgba(255, 107, 107, 0.2);
-  --expense-color-light: #ff8787;
+  --income-color: #00875a;
+  --income-bg: rgba(0, 135, 90, 0.12);
+  --income-glow: rgba(0, 135, 90, 0.25);
+  --income-color-light: #00b875;
+  --expense-color: #e03131;
+  --expense-bg: rgba(224, 49, 49, 0.12);
+  --expense-glow: rgba(224, 49, 49, 0.25);
+  --expense-color-light: #ff4444;
 
-  --border-color: rgba(0, 0, 0, 0.08);
-  --border-color-active: rgba(108, 92, 231, 0.4);
-  --border-hover: rgba(0, 0, 0, 0.12);
-  --divider: rgba(0, 0, 0, 0.06);
+  --border-color: rgba(0, 0, 0, 0.12);
+  --border-color-active: rgba(95, 61, 196, 0.5);
+  --border-hover: rgba(0, 0, 0, 0.18);
+  --divider: rgba(0, 0, 0, 0.1);
 
-  --danger: #ff4757;
-  --warning: #ffa502;
-  --success: #2ed573;
-  --info: #1e90ff;
+  --danger: #e03131;
+  --warning: #f59f00;
+  --success: #2b8a3e;
+  --info: #1971c2;
 
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
   --shadow-glow-accent: 0 0 20px var(--accent-primary-glow);
   --shadow-glow-income: 0 0 16px var(--income-glow);
   --shadow-glow-expense: 0 0 16px var(--expense-glow);

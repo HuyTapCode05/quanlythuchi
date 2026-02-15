@@ -1,5 +1,56 @@
 # Hướng dẫn Deploy FinTrack lên Web
 
+## 📦 GitHub Pages (Chỉ Frontend - Miễn phí)
+
+**Lưu ý**: GitHub Pages chỉ hỗ trợ static sites, không chạy được backend Node.js. Cần deploy backend riêng.
+
+### Cách 1: GitHub Actions (Tự động)
+
+1. Tạo file `.github/workflows/deploy.yml`:
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm run build
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+```
+
+2. Push code lên GitHub
+3. Vào Settings → Pages → Source: GitHub Actions
+4. Website sẽ có tại: `https://<username>.github.io/quanlythuchi`
+
+### Cách 2: Deploy thủ công
+
+```bash
+npm run build
+cd dist
+git init
+git add .
+git commit -m "Deploy to GitHub Pages"
+git branch -M gh-pages
+git remote add origin https://github.com/HuyTapCode05/quanlythuchi.git
+git push -u origin gh-pages
+```
+
+Sau đó vào Settings → Pages → Source: `gh-pages` branch
+
+**Lưu ý**: Cần deploy backend riêng trên Railway/Render và cập nhật `VITE_API_URL`.
+
 ## 🚀 Deploy lên Vercel (Khuyến nghị - Miễn phí)
 
 ### Bước 1: Cài đặt Vercel CLI

@@ -10,4 +10,5 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['sql.js']
   },
+  base: process.env.NODE_ENV === 'production' ? '/quanlythuchi/' : '/',
 })

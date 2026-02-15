@@ -17,6 +17,17 @@ export function useSavingsGoals() {
         }
     }, [user?.id])
 
+    const normalizeGoal = (goal) => {
+        return {
+            id: goal.id,
+            name: goal.name,
+            targetAmount: goal.targetAmount || goal.target_amount || 0,
+            currentAmount: goal.currentAmount || goal.current_amount || 0,
+            targetDate: goal.targetDate || goal.target_date || null,
+            isCompleted: goal.isCompleted !== undefined ? goal.isCompleted : (goal.is_completed !== undefined ? goal.is_completed : 0)
+        }
+    }
+
     const loadGoals = useCallback(async () => {
         if (!user?.id) {
             setGoals([])
@@ -26,7 +37,9 @@ export function useSavingsGoals() {
             setLoading(true)
             const data = await api.getSavingsGoals(user.id)
             if (Array.isArray(data)) {
-                setGoals(data)
+                // Normalize data từ snake_case sang camelCase
+                const normalized = data.map(normalizeGoal)
+                setGoals(normalized)
             } else {
                 setGoals([])
             }

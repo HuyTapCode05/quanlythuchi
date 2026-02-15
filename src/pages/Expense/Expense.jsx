@@ -319,6 +319,7 @@ export default function Expense({ transactions, categories, addTransaction, upda
                     categories={expenseCategories}
                     onSubmit={handleSubmit}
                     onCancel={() => { setShowModal(false); setEditTx(null) }}
+                    hideTypeToggle={true}
                     initialData={editTx ? {
                         type: 'expense',
                         amount: editTx.amount,

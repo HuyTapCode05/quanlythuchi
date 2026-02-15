@@ -319,6 +319,7 @@ export default function Income({ transactions, categories, addTransaction, updat
                     categories={incomeCategories}
                     onSubmit={handleSubmit}
                     onCancel={() => { setShowModal(false); setEditTx(null) }}
+                    hideTypeToggle={true}
                     initialData={editTx ? {
                         type: 'income',
                         amount: editTx.amount,

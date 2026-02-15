@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function TransactionForm({ categories, onSubmit, initialData, onCancel }) {
+export default function TransactionForm({ categories, onSubmit, initialData, onCancel, hideTypeToggle = false }) {
     const [form, setForm] = useState({
         type: 'expense',
         amount: '',
@@ -45,23 +45,25 @@ export default function TransactionForm({ categories, onSubmit, initialData, onC
 
     return (
         <form onSubmit={handleSubmit} className="tx-form">
-            {/* Type toggle */}
-            <div className="tx-form__type-toggle">
-                <button
-                    type="button"
-                    className={`tx-form__type-btn ${form.type === 'expense' ? 'tx-form__type-btn--active tx-form__type-btn--expense' : ''}`}
-                    onClick={() => handleChange('type', 'expense')}
-                >
-                    Chi tiêu
-                </button>
-                <button
-                    type="button"
-                    className={`tx-form__type-btn ${form.type === 'income' ? 'tx-form__type-btn--active tx-form__type-btn--income' : ''}`}
-                    onClick={() => handleChange('type', 'income')}
-                >
-                    Thu nhập
-                </button>
-            </div>
+            {/* Type toggle - chỉ hiển thị nếu không ẩn */}
+            {!hideTypeToggle && (
+                <div className="tx-form__type-toggle">
+                    <button
+                        type="button"
+                        className={`tx-form__type-btn ${form.type === 'expense' ? 'tx-form__type-btn--active tx-form__type-btn--expense' : ''}`}
+                        onClick={() => handleChange('type', 'expense')}
+                    >
+                        Chi tiêu
+                    </button>
+                    <button
+                        type="button"
+                        className={`tx-form__type-btn ${form.type === 'income' ? 'tx-form__type-btn--active tx-form__type-btn--income' : ''}`}
+                        onClick={() => handleChange('type', 'income')}
+                    >
+                        Thu nhập
+                    </button>
+                </div>
+            )}
 
             {/* Amount */}
             <div className="form-group">

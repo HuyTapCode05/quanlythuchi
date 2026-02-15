@@ -6,6 +6,7 @@ import Expense from './pages/Expense/Expense'
 import Recurring from './pages/Recurring/Recurring'
 import Budget from './pages/Budget/Budget'
 import Savings from './pages/Savings/Savings'
+import Statistics from './pages/Statistics/Statistics'
 import Categories from './pages/Categories/Categories'
 import { useTransactions } from './hooks/useTransactions'
 import { useCategories } from './hooks/useCategories'
@@ -204,6 +205,17 @@ export default function App() {
                             updateGoal={updateSavingsGoal}
                             deleteGoal={deleteSavingsGoal}
                             addToGoal={addToSavingsGoal}
+                        />
+                    }
+                />
+                <Route
+                    path="/statistics"
+                    element={
+                        <Statistics
+                            transactions={transactions}
+                            categories={categories}
+                            totalIncome={totalIncome}
+                            totalExpense={totalExpense}
                         />
                     }
                 />

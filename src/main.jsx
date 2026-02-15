@@ -6,9 +6,11 @@ import './index.css'
 import { AuthProvider } from './hooks/useAuth'
 import { ThemeProvider } from './hooks/useTheme'
 
+const basename = import.meta.env.BASE_URL || '/'
+
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <BrowserRouter>
+        <BrowserRouter basename={basename}>
             <ThemeProvider>
                 <AuthProvider>
                     <App />

@@ -31,8 +31,7 @@ export default function Register() {
         }
         try {
             setLoading(true)
-            await new Promise(resolve => setTimeout(resolve, 400))
-            register(name.trim(), email.trim(), password)
+            await register(name.trim(), email.trim(), password)
             navigate('/', { replace: true })
         } catch (err) {
             setError(err.message || 'Đăng ký thất bại')

@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { api } from '../utils/api'
+import { useAuth } from './useAuth'
 
 const DEFAULT_CATEGORIES = [
     { id: '1', name: 'Ăn uống', color: '#ff6b6b', icon: '🍔', type: 'expense' },
@@ -19,23 +21,79 @@ const DEFAULT_CATEGORIES = [
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
 
 export function useCategories() {
+    const { user } = useAuth()
     const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
+    const [loading, setLoading] = useState(false)
 
-    const addCategory = useCallback((data) => {
-        const newCat = { id: generateId(), ...data }
-        setCategories(prev => [...prev, newCat])
-        return newCat
-    }, [])
+    useEffect(() => {
+        if (user?.id) {
+            loadCategories()
+        } else {
+            setCategories(DEFAULT_CATEGORIES)
+        }
+    }, [user?.id])
 
-    const updateCategory = useCallback((id, data) => {
-        setCategories(prev =>
-            prev.map(cat => cat.id === id ? { ...cat, ...data } : cat)
-        )
-    }, [])
+    const loadCategories = async () => {
+        try {
+            setLoading(true)
+            const data = await api.getCategories(user.id)
+            setCategories(data.length ? data : DEFAULT_CATEGORIES)
+        } catch (error) {
+            console.error('Load categories error:', error)
+            setCategories(DEFAULT_CATEGORIES)
+        } finally {
+            setLoading(false)
+        }
+    }
 
-    const deleteCategory = useCallback((id) => {
-        setCategories(prev => prev.filter(cat => cat.id !== id))
-    }, [])
+    const addCategory = useCallback(async (data) => {
+        if (!user?.id) {
+            const newCat = { id: generateId(), ...data }
+            setCategories(prev => [...prev, newCat])
+            return newCat
+        }
+        try {
+            const newCat = { id: generateId(), ...data }
+            await api.addCategory(newCat, user.id)
+            setCategories(prev => [...prev, newCat])
+            return newCat
+        } catch (error) {
+            console.error('Add category error:', error)
+            throw error
+        }
+    }, [user?.id])
+
+    const updateCategory = useCallback(async (id, data) => {
+        if (!user?.id) {
+            setCategories(prev =>
+                prev.map(cat => cat.id === id ? { ...cat, ...data } : cat)
+            )
+            return
+        }
+        try {
+            await api.updateCategory(id, data)
+            setCategories(prev =>
+                prev.map(cat => cat.id === id ? { ...cat, ...data } : cat)
+            )
+        } catch (error) {
+            console.error('Update category error:', error)
+            throw error
+        }
+    }, [user?.id])
+
+    const deleteCategory = useCallback(async (id) => {
+        if (!user?.id) {
+            setCategories(prev => prev.filter(cat => cat.id !== id))
+            return
+        }
+        try {
+            await api.deleteCategory(id)
+            setCategories(prev => prev.filter(cat => cat.id !== id))
+        } catch (error) {
+            console.error('Delete category error:', error)
+            throw error
+        }
+    }, [user?.id])
 
     const replaceAllCategories = useCallback((list) => {
         if (!Array.isArray(list)) return
@@ -67,6 +125,7 @@ export function useCategories() {
 
     return {
         categories,
+        loading,
         addCategory,
         updateCategory,
         deleteCategory,

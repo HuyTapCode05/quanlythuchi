@@ -1,22 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { api } from '../utils/api'
 
 const AuthContext = createContext(null)
-
-const USERS_KEY = 'fintrack_users'
 const CURRENT_USER_KEY = 'fintrack_current_user'
-
-const loadUsers = () => {
-    try {
-        const raw = localStorage.getItem(USERS_KEY)
-        return raw ? JSON.parse(raw) : []
-    } catch {
-        return []
-    }
-}
-
-const saveUsers = (users) => {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users))
-}
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
@@ -32,34 +18,16 @@ export function AuthProvider({ children }) {
         }
     }, [])
 
-    const login = (email, password) => {
-        const users = loadUsers()
-        const existing = users.find(u => u.email === email && u.password === password)
-        if (!existing) {
-            throw new Error('Email hoặc mật khẩu không đúng')
-        }
-        const safeUser = { id: existing.id, name: existing.name, email: existing.email }
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(safeUser))
-        setUser(safeUser)
+    const login = async (email, password) => {
+        const userData = await api.login(email, password)
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userData))
+        setUser(userData)
     }
 
-    const register = (name, email, password) => {
-        const users = loadUsers()
-        const existed = users.find(u => u.email === email)
-        if (existed) {
-            throw new Error('Email đã được sử dụng')
-        }
-        const newUser = {
-            id: Date.now().toString(),
-            name,
-            email,
-            password
-        }
-        const updated = [...users, newUser]
-        saveUsers(updated)
-        const safeUser = { id: newUser.id, name: newUser.name, email: newUser.email }
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(safeUser))
-        setUser(safeUser)
+    const register = async (name, email, password) => {
+        const userData = await api.register(name, email, password)
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userData))
+        setUser(userData)
     }
 
     const logout = () => {

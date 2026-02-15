@@ -21,8 +21,7 @@ export default function Login() {
         }
         try {
             setLoading(true)
-            await new Promise(resolve => setTimeout(resolve, 400))
-            login(email.trim(), password)
+            await login(email.trim(), password)
             navigate('/', { replace: true })
         } catch (err) {
             setError(err.message || 'Đăng nhập thất bại')

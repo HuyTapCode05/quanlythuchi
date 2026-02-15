@@ -1,29 +1,101 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { api } from '../utils/api'
+import { useAuth } from './useAuth'
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
 
-export function useTransactions() {
-    const [transactions, setTransactions] = useState([])
+const normalizeTransaction = (raw) => ({
+    id: raw.id || generateId(),
+    type: raw.type === 'income' ? 'income' : 'expense',
+    amount: Math.abs(Number(raw.amount) || 0),
+    category: raw.category,
+    note: raw.note || '',
+    createdAt: raw.createdAt || new Date().toISOString()
+})
 
-    const addTransaction = useCallback((data) => {
+export function useTransactions() {
+    const { user } = useAuth()
+    const [transactions, setTransactions] = useState([])
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (user?.id) {
+            loadTransactions()
+        } else {
+            setTransactions([])
+        }
+    }, [user?.id])
+
+    const loadTransactions = async () => {
+        try {
+            setLoading(true)
+            const data = await api.getTransactions(user.id)
+            setTransactions(data.map(normalizeTransaction))
+        } catch (error) {
+            console.error('Load transactions error:', error)
+            setTransactions([])
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const addTransaction = useCallback(async (data) => {
         const newTx = normalizeTransaction({
             id: generateId(),
             ...data,
             createdAt: new Date().toISOString()
         })
-        setTransactions(prev => [newTx, ...prev])
-        return newTx
-    }, [])
+        
+        if (!user?.id) {
+            setTransactions(prev => [newTx, ...prev])
+            return newTx
+        }
+        
+        try {
+            await api.addTransaction(newTx, user.id)
+            setTransactions(prev => [newTx, ...prev])
+            return newTx
+        } catch (error) {
+            console.error('Add transaction error:', error)
+            throw error
+        }
+    }, [user?.id])
 
-    const updateTransaction = useCallback((id, data) => {
-        setTransactions(prev =>
-            prev.map(tx => tx.id === id ? normalizeTransaction({ ...tx, ...data }) : tx)
-        )
-    }, [])
+    const updateTransaction = useCallback(async (id, data) => {
+        const updated = normalizeTransaction({ ...data })
+        
+        if (!user?.id) {
+            setTransactions(prev =>
+                prev.map(tx => tx.id === id ? updated : tx)
+            )
+            return
+        }
+        
+        try {
+            await api.updateTransaction(id, updated)
+            setTransactions(prev =>
+                prev.map(tx => tx.id === id ? updated : tx)
+            )
+        } catch (error) {
+            console.error('Update transaction error:', error)
+            throw error
+        }
+    }, [user?.id])
 
-    const deleteTransaction = useCallback((id) => {
-        setTransactions(prev => prev.filter(tx => tx.id !== id))
-    }, [])
+    const deleteTransaction = useCallback(async (id) => {
+        if (!user?.id) {
+            setTransactions(prev => prev.filter(tx => tx.id !== id))
+            return
+        }
+        
+        try {
+            await api.deleteTransaction(id)
+            setTransactions(prev => prev.filter(tx => tx.id !== id))
+        } catch (error) {
+            console.error('Delete transaction error:', error)
+            throw error
+        }
+    }, [user?.id])
 
     const replaceAllTransactions = useCallback((list) => {
         if (!Array.isArray(list)) return
@@ -74,6 +146,7 @@ export function useTransactions() {
 
     return {
         transactions,
+        loading,
         addTransaction,
         updateTransaction,
         deleteTransaction,

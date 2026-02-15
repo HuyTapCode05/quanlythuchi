@@ -1,7 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout/Layout'
 import Dashboard from './pages/Dashboard/Dashboard'
-import Transactions from './pages/Transactions/Transactions'
+import Income from './pages/Income/Income'
+import Expense from './pages/Expense/Expense'
 import Categories from './pages/Categories/Categories'
 import { useTransactions } from './hooks/useTransactions'
 import { useCategories } from './hooks/useCategories'
@@ -116,9 +117,21 @@ export default function App() {
                     }
                 />
                 <Route
-                    path="/transactions"
+                    path="/income"
                     element={
-                        <Transactions
+                        <Income
+                            transactions={transactions}
+                            categories={categories}
+                            addTransaction={addTransaction}
+                            updateTransaction={updateTransaction}
+                            deleteTransaction={deleteTransaction}
+                        />
+                    }
+                />
+                <Route
+                    path="/expense"
+                    element={
+                        <Expense
                             transactions={transactions}
                             categories={categories}
                             addTransaction={addTransaction}

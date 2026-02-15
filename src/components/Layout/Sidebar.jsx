@@ -1,13 +1,14 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import {
-    LayoutDashboard, ArrowLeftRight, Tag, ChevronLeft,
+    LayoutDashboard, TrendingUp, TrendingDown, Tag, ChevronLeft,
     ChevronRight, Wallet
 } from 'lucide-react'
 import './Sidebar.css'
 
 const menuItems = [
     { path: '/', icon: LayoutDashboard, label: 'Tổng quan' },
-    { path: '/transactions', icon: ArrowLeftRight, label: 'Giao dịch' },
+    { path: '/income', icon: TrendingUp, label: 'Thu nhập' },
+    { path: '/expense', icon: TrendingDown, label: 'Chi tiêu' },
     { path: '/categories', icon: Tag, label: 'Danh mục' },
 ]
 

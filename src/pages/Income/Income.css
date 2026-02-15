@@ -1,0 +1,154 @@
+.income-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.income-page__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+}
+
+.income-page__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-bold);
+    color: var(--text-heading);
+}
+
+.income-page__subtitle {
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    margin-top: var(--space-xs);
+}
+
+.income-page__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.income-page__filters {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.income-page__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 200px;
+    max-width: 320px;
+}
+
+.income-page__search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.income-page__search-input {
+    padding-left: 36px !important;
+}
+
+.income-page__filter-select {
+    min-width: 140px;
+    max-width: 180px;
+}
+
+.income-page__date-filter {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+}
+
+.income-page__date-icon {
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.income-page__date-input {
+    width: 140px;
+    padding: var(--space-xs) var(--space-sm) !important;
+    font-size: var(--fs-xs) !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.income-page__date-input:focus {
+    box-shadow: none !important;
+}
+
+.income-page__date-separator {
+    color: var(--text-muted);
+    font-size: var(--fs-xs);
+    flex-shrink: 0;
+}
+
+.income-page__date-clear {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.income-page__date-presets {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex-wrap: wrap;
+}
+
+.income-page__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.income-page__pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    padding: var(--space-md) 0;
+}
+
+.income-page__page-info {
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .income-page__toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .income-page__search {
+        max-width: 100%;
+    }
+
+    .income-page__filter-select {
+        min-width: auto;
+        flex: 1;
+    }
+}
+

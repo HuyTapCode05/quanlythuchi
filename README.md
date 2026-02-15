@@ -71,14 +71,39 @@ npm run build
 
 ### 🌐 Deploy lên Web
 
-Xem file `DEPLOY.md` để biết hướng dẫn chi tiết deploy lên Vercel, Netlify, Railway, Render, v.v.
+#### Bước 1: Deploy Frontend lên GitHub Pages (Miễn phí)
 
-**Nhanh nhất với Vercel:**
-1. Vào https://vercel.com
+1. Vào repository: https://github.com/HuyTapCode05/quanlythuchi
+2. Click tab **Actions** (ở menu trên)
+3. Nếu workflow chưa chạy, click **"Deploy to GitHub Pages"** → **"Run workflow"**
+4. Đợi 2-3 phút để workflow hoàn thành
+5. Website sẽ có tại: **https://huytapcode05.github.io/quanlythuchi/**
+
+#### Bước 2: Deploy Backend lên Railway (Miễn phí)
+
+**Lưu ý**: GitHub Pages chỉ chạy frontend. Backend cần deploy riêng.
+
+1. Vào https://railway.app
 2. Đăng nhập bằng GitHub
-3. Import repository `HuyTapCode05/quanlythuchi`
-4. Vercel tự động detect và deploy!
+3. Click **"New Project"**
+4. Chọn **"Deploy from GitHub repo"**
+5. Chọn repository `quanlythuchi`
+6. Railway tự động detect và deploy backend
+7. Đợi 2-3 phút
+8. Copy URL backend (ví dụ: `https://quanlythuchi-production.up.railway.app`)
 
-**Lưu ý**: Backend cần deploy riêng trên Railway hoặc Render vì `better-sqlite3` cần native bindings.
+#### Bước 3: Kết nối Frontend với Backend
+
+1. Vào GitHub repository → **Settings** → **Secrets and variables** → **Actions**
+2. Click **"New repository secret"**
+3. Name: `VITE_API_URL`
+4. Value: `https://your-backend-url.railway.app/api` (thay bằng URL thật từ Railway)
+5. Click **"Add secret"**
+6. Vào tab **Actions** → Chạy lại workflow **"Deploy to GitHub Pages"**
+
+#### Hoàn thành! 🎉
+
+- **Frontend**: https://huytapcode05.github.io/quanlythuchi/
+- **Backend**: URL từ Railway
 
 

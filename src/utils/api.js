@@ -99,6 +99,44 @@ export const api = {
         })
         if (!res.ok) throw new Error('Lỗi khi xóa giao dịch')
         return res.json()
+    },
+
+    // Budgets
+    getBudgets: async (userId) => {
+        const res = await fetch(`${API_URL}/budgets/${userId}`)
+        if (!res.ok) throw new Error('Lỗi khi tải ngân sách')
+        return res.json()
+    },
+
+    addBudget: async (budget, userId) => {
+        const res = await fetch(`${API_URL}/budgets`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...budget, userId })
+        })
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({ error: 'Lỗi khi thêm ngân sách' }))
+            throw new Error(error.error || 'Lỗi khi thêm ngân sách')
+        }
+        return res.json()
+    },
+
+    updateBudget: async (id, budget) => {
+        const res = await fetch(`${API_URL}/budgets/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(budget)
+        })
+        if (!res.ok) throw new Error('Lỗi khi cập nhật ngân sách')
+        return res.json()
+    },
+
+    deleteBudget: async (id) => {
+        const res = await fetch(`${API_URL}/budgets/${id}`, {
+            method: 'DELETE'
+        })
+        if (!res.ok) throw new Error('Lỗi khi xóa ngân sách')
+        return res.json()
     }
 }
 

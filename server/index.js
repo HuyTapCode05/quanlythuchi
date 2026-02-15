@@ -49,6 +49,15 @@ db.exec(`
         user_id TEXT,
         created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS budgets (
+        id TEXT PRIMARY KEY,
+        category_id TEXT NOT NULL,
+        amount REAL NOT NULL,
+        period TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
     
     PRAGMA foreign_keys = ON;
 `)
@@ -195,6 +204,68 @@ app.delete('/api/transactions/:id', (req, res) => {
     try {
         const { id } = req.params
         const stmt = db.prepare('DELETE FROM transactions WHERE id = ?')
+        stmt.run(id)
+        res.json({ success: true })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+// ===== BUDGETS API =====
+app.get('/api/budgets/:userId', (req, res) => {
+    try {
+        const { userId } = req.params
+        const stmt = db.prepare('SELECT * FROM budgets WHERE user_id = ? ORDER BY created_at DESC')
+        const budgets = stmt.all(userId)
+        res.json(budgets)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.post('/api/budgets', (req, res) => {
+    try {
+        const { id, categoryId, amount, period, userId } = req.body
+        
+        if (!id || !categoryId || !amount || !period || !userId) {
+            return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' })
+        }
+        
+        const stmt = db.prepare('INSERT INTO budgets (id, category_id, amount, period, user_id) VALUES (?, ?, ?, ?, ?)')
+        const result = stmt.run(id, categoryId, Number(amount), period, userId)
+        
+        if (result.changes === 0) {
+            throw new Error('Không thể thêm ngân sách vào database')
+        }
+        
+        res.json({ id, categoryId, amount: Number(amount), period, userId })
+    } catch (error) {
+        console.error('Add budget error:', error)
+        res.status(500).json({ error: error.message || 'Lỗi không xác định' })
+    }
+})
+
+app.put('/api/budgets/:id', (req, res) => {
+    try {
+        const { id } = req.params
+        const { categoryId, amount, period } = req.body
+        
+        if (!categoryId || !amount || !period) {
+            return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' })
+        }
+        
+        const stmt = db.prepare('UPDATE budgets SET category_id = ?, amount = ?, period = ? WHERE id = ?')
+        stmt.run(categoryId, Number(amount), period, id)
+        res.json({ success: true })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.delete('/api/budgets/:id', (req, res) => {
+    try {
+        const { id } = req.params
+        const stmt = db.prepare('DELETE FROM budgets WHERE id = ?')
         stmt.run(id)
         res.json({ success: true })
     } catch (error) {

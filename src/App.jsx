@@ -3,9 +3,11 @@ import Layout from './components/Layout/Layout'
 import Dashboard from './pages/Dashboard/Dashboard'
 import Income from './pages/Income/Income'
 import Expense from './pages/Expense/Expense'
+import Budget from './pages/Budget/Budget'
 import Categories from './pages/Categories/Categories'
 import { useTransactions } from './hooks/useTransactions'
 import { useCategories } from './hooks/useCategories'
+import { useBudgets } from './hooks/useBudgets'
 import { useAuth } from './hooks/useAuth'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
@@ -35,6 +37,13 @@ export default function App() {
         replaceAllCategories,
         getCategoriesSnapshot
     } = useCategories()
+
+    const {
+        budgets,
+        addBudget,
+        updateBudget,
+        deleteBudget
+    } = useBudgets()
 
     const {
         replaceAllTransactions,
@@ -137,6 +146,19 @@ export default function App() {
                             addTransaction={addTransaction}
                             updateTransaction={updateTransaction}
                             deleteTransaction={deleteTransaction}
+                        />
+                    }
+                />
+                <Route
+                    path="/budget"
+                    element={
+                        <Budget
+                            budgets={budgets}
+                            categories={categories}
+                            transactions={transactions}
+                            addBudget={addBudget}
+                            updateBudget={updateBudget}
+                            deleteBudget={deleteBudget}
                         />
                     }
                 />

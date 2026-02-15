@@ -12,10 +12,9 @@ export function useSavingsGoals() {
     useEffect(() => {
         if (user?.id) {
             loadGoals()
-        } else {
-            setGoals([])
         }
-    }, [user?.id])
+        // Không reset về [] khi user chưa load xong, giữ nguyên data cũ
+    }, [user?.id, loadGoals])
 
     const normalizeGoal = (goal) => {
         return {
@@ -36,11 +35,14 @@ export function useSavingsGoals() {
         try {
             setLoading(true)
             const data = await api.getSavingsGoals(user.id)
+            console.log('Raw data from API:', data)
             if (Array.isArray(data)) {
                 // Normalize data từ snake_case sang camelCase
                 const normalized = data.map(normalizeGoal)
+                console.log('Normalized goals:', normalized)
                 setGoals(normalized)
             } else {
+                console.warn('Data is not an array:', data)
                 setGoals([])
             }
         } catch (error) {

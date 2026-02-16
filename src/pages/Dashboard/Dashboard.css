@@ -128,7 +128,48 @@
 }
 
 @media (max-width: 768px) {
+    .dashboard {
+        gap: var(--space-md);
+    }
+
     .dashboard__stats {
         grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    .dashboard__charts {
+        gap: var(--space-md);
+    }
+
+    .dashboard__pie-wrap {
+        gap: var(--space-sm);
+    }
+
+    .dashboard__pie-legend {
+        gap: var(--space-xs);
+    }
+
+    .dashboard__tx-item {
+        padding: var(--space-sm);
+        gap: var(--space-sm);
+    }
+
+    .dashboard__tx-icon {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        font-size: 1rem;
+    }
+
+    .dashboard__tx-name {
+        font-size: var(--fs-xs);
+    }
+
+    .dashboard__tx-meta {
+        font-size: 10px;
+    }
+
+    .dashboard__tx-amount {
+        font-size: var(--fs-xs);
     }
 }

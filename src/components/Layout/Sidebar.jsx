@@ -16,11 +16,18 @@ const menuItems = [
     { path: '/categories', icon: Tag, label: 'Danh mục' },
 ]
 
-export default function Sidebar({ collapsed, onToggle }) {
+export default function Sidebar({ collapsed, mobileOpen, onToggle, onMobileClose }) {
     const location = useLocation()
 
+    const handleLinkClick = () => {
+        // Close mobile menu when clicking a link on mobile
+        if (window.innerWidth <= 768 && onMobileClose) {
+            onMobileClose()
+        }
+    }
+
     return (
-        <aside className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}>
+        <aside className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''} ${mobileOpen ? 'sidebar--open' : ''}`}>
             <div className="sidebar__header">
                 <div className="sidebar__logo">
                     <div className="sidebar__logo-icon">
@@ -42,6 +49,7 @@ export default function Sidebar({ collapsed, onToggle }) {
                             `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`
                         }
                         end={item.path === '/'}
+                        onClick={handleLinkClick}
                     >
                         <item.icon size={20} />
                         {!collapsed && <span>{item.label}</span>}

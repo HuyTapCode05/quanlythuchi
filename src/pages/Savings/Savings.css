@@ -245,8 +245,35 @@
 }
 
 @media (max-width: 768px) {
+    .savings-page {
+        gap: var(--space-md);
+    }
+
+    .savings-page__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .savings-page__title {
+        font-size: var(--fs-xl);
+    }
+
     .savings-page__summary {
         grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    .savings-summary-card {
+        padding: var(--space-md);
+    }
+
+    .savings-summary-card__value {
+        font-size: var(--fs-lg);
+    }
+
+    .savings-goal {
+        padding: var(--space-md);
     }
 
     .savings-goal__header {
@@ -254,8 +281,26 @@
         align-items: stretch;
     }
 
+    .savings-goal__name {
+        font-size: var(--fs-base);
+    }
+
+    .savings-goal__amounts {
+        font-size: var(--fs-sm);
+    }
+
     .savings-goal__actions {
         justify-content: flex-start;
+        width: 100%;
+        margin-top: var(--space-sm);
+    }
+
+    .savings-form__actions {
+        flex-direction: column-reverse;
+    }
+
+    .savings-form__actions .btn {
+        width: 100%;
     }
 }
 

@@ -166,10 +166,24 @@
 @media (max-width: 768px) {
     .sidebar {
         transform: translateX(-100%);
+        width: 280px;
+        transition: transform var(--transition-slow);
     }
 
     .sidebar--open {
         transform: translateX(0);
         box-shadow: var(--shadow-lg);
+    }
+
+    .sidebar--collapsed {
+        width: 280px;
+    }
+
+    .sidebar__link {
+        padding: var(--space-md) var(--space-lg);
+    }
+
+    .sidebar__link span {
+        display: block !important;
     }
 }

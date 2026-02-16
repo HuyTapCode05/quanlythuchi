@@ -216,14 +216,66 @@
 }
 
 @media (max-width: 768px) {
+    .budget-page {
+        gap: var(--space-md);
+    }
+
+    .budget-page__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .budget-page__title {
+        font-size: var(--fs-xl);
+    }
+
     .budget-page__summary {
         grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    .budget-card {
+        padding: var(--space-md);
+    }
+
+    .budget-card__value {
+        font-size: var(--fs-lg);
+    }
+
+    .budget-page__filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-sm);
+    }
+
+    .budget-page__period-filter {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-sm);
+    }
+
+    .budget-item {
+        padding: var(--space-md);
     }
 
     .budget-item__header {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--space-md);
+    }
+
+    .budget-item__actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .budget-form__actions {
+        flex-direction: column-reverse;
+    }
+
+    .budget-form__actions .btn {
+        width: 100%;
     }
 }
 

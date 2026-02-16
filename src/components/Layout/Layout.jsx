@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, Search, Bell, Sun, Moon, Monitor } from 'lucide-react'
 import Sidebar from './Sidebar'
+import BottomNav from './BottomNav'
 import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
 import './Layout.css'
@@ -56,9 +57,19 @@ export default function Layout({ onExportData, onImportData }) {
 
     return (
         <div className={`layout ${collapsed ? 'layout--collapsed' : ''}`}>
+            {/* Mobile Overlay */}
+            {mobileOpen && (
+                <div
+                    className="layout__overlay"
+                    onClick={() => setMobileOpen(false)}
+                />
+            )}
+
             <Sidebar
                 collapsed={collapsed}
+                mobileOpen={mobileOpen}
                 onToggle={() => setCollapsed(!collapsed)}
+                onMobileClose={() => setMobileOpen(false)}
             />
 
             <div className="layout__main">
@@ -138,6 +149,8 @@ export default function Layout({ onExportData, onImportData }) {
                     <Outlet />
                 </main>
             </div>
+
+            <BottomNav />
         </div>
     )
 }

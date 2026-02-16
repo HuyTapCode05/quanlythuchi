@@ -137,18 +137,69 @@
 }
 
 @media (max-width: 768px) {
+    .expense-page {
+        gap: var(--space-md);
+    }
+
+    .expense-page__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .expense-page__title {
+        font-size: var(--fs-xl);
+    }
+
     .expense-page__toolbar {
         flex-direction: column;
         align-items: stretch;
+        gap: var(--space-sm);
+    }
+
+    .expense-page__filters {
+        flex-direction: column;
+        gap: var(--space-sm);
     }
 
     .expense-page__search {
         max-width: 100%;
+        min-width: auto;
     }
 
     .expense-page__filter-select {
         min-width: auto;
+        width: 100%;
+    }
+
+    .expense-page__date-filter {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .expense-page__date-input {
+        width: auto;
         flex: 1;
+    }
+
+    .expense-page__date-presets {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: var(--space-xs);
+    }
+
+    .expense-page__actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .expense-page__actions .btn {
+        flex: 1;
+    }
+
+    .expense-page__pagination {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
     }
 }
 

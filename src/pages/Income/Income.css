@@ -108,12 +108,24 @@
     width: 140px;
     padding: var(--space-xs) var(--space-sm) !important;
     font-size: var(--fs-xs) !important;
-    background: transparent !important;
-    border: none !important;
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-sm) !important;
+    color: var(--text-primary) !important;
 }
 
 .income-page__date-input:focus {
-    box-shadow: none !important;
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 2px var(--accent-primary-glow) !important;
+}
+
+.income-page__date-input::-webkit-calendar-picker-indicator {
+    filter: invert(0.5);
+    cursor: pointer;
+}
+
+[data-theme="light"] .income-page__date-input::-webkit-calendar-picker-indicator {
+    filter: invert(0.3);
 }
 
 .income-page__date-separator {
@@ -169,6 +181,12 @@
     border-radius: var(--radius-lg);
     padding: var(--space-md);
     transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.income-page__mobile-card:active {
+    transform: scale(0.98);
+    background: var(--bg-card-hover);
 }
 
 .income-page__mobile-card:hover {
@@ -231,6 +249,11 @@
 .income-page__mobile-card-actions {
     display: flex;
     gap: var(--space-xs);
+}
+
+.income-page__mobile-card-actions .btn-icon {
+    min-width: 36px;
+    min-height: 36px;
 }
 
 /* Floating Action Button */
@@ -332,9 +355,17 @@
     .income-page__date-input {
         width: 100%;
         flex: 1;
-        font-size: var(--fs-sm) !important;
-        padding: var(--space-sm) var(--space-md) !important;
+        font-size: var(--fs-base) !important;
+        padding: var(--space-md) !important;
         min-height: 44px;
+        background: var(--bg-input) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius-md) !important;
+    }
+
+    .income-page__date-input:focus {
+        border-color: var(--accent-primary) !important;
+        box-shadow: 0 0 0 3px var(--accent-primary-glow) !important;
     }
 
     .income-page__date-separator {

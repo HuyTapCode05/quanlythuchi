@@ -133,7 +133,7 @@ export default function Expense({ transactions, categories, addTransaction, upda
                         Tổng chi tiêu: <span className="text-expense">{formatCurrency(totalAmount)}</span>
                     </p>
                 </div>
-                <button className="btn btn-primary" onClick={() => { setEditTx(null); setShowModal(true) }}>
+                <button className="btn btn-primary expense-page__add-btn" onClick={() => { setEditTx(null); setShowModal(true) }}>
                     <Plus size={16} /> Thêm chi tiêu
                 </button>
             </div>
@@ -166,21 +166,27 @@ export default function Expense({ transactions, categories, addTransaction, upda
                     {/* Date Range Filter */}
                     <div className="expense-page__date-filter">
                         <Calendar size={16} className="expense-page__date-icon" />
-                        <input
-                            type="date"
-                            className="form-input expense-page__date-input"
-                            value={dateFrom}
-                            onChange={e => { setDateFrom(e.target.value); setPage(1) }}
-                            placeholder="Từ ngày"
-                        />
-                        <span className="expense-page__date-separator">→</span>
-                        <input
-                            type="date"
-                            className="form-input expense-page__date-input"
-                            value={dateTo}
-                            onChange={e => { setDateTo(e.target.value); setPage(1) }}
-                            placeholder="Đến ngày"
-                        />
+                        <div className="expense-page__date-inputs">
+                            <div className="expense-page__date-input-wrapper">
+                                <label className="expense-page__date-label">Từ ngày</label>
+                                <input
+                                    type="date"
+                                    className="form-input expense-page__date-input"
+                                    value={dateFrom}
+                                    onChange={e => { setDateFrom(e.target.value); setPage(1) }}
+                                />
+                            </div>
+                            <span className="expense-page__date-separator">→</span>
+                            <div className="expense-page__date-input-wrapper">
+                                <label className="expense-page__date-label">Đến ngày</label>
+                                <input
+                                    type="date"
+                                    className="form-input expense-page__date-input"
+                                    value={dateTo}
+                                    onChange={e => { setDateTo(e.target.value); setPage(1) }}
+                                />
+                            </div>
+                        </div>
                         {(dateFrom || dateTo) && (
                             <button
                                 className="btn-icon btn-ghost expense-page__date-clear"
@@ -222,10 +228,10 @@ export default function Expense({ transactions, categories, addTransaction, upda
                 </div>
             </div>
 
-            {/* Table */}
+            {/* Table - Desktop */}
             {paginated.length > 0 ? (
                 <>
-                    <div className="table-container animate-fade-in-up">
+                    <div className="table-container animate-fade-in-up expense-page__table-desktop">
                         <table className="table">
                             <thead>
                                 <tr>
@@ -271,6 +277,46 @@ export default function Expense({ transactions, categories, addTransaction, upda
                         </table>
                     </div>
 
+                    {/* Mobile Card Layout */}
+                    <div className="expense-page__mobile-list">
+                        {paginated.map(tx => {
+                            const cat = getCat(tx.category)
+                            return (
+                                <div key={tx.id} className="expense-page__mobile-card">
+                                    <div className="expense-page__mobile-card-header">
+                                        <div className="expense-page__mobile-card-category">
+                                            <span className="category-tag__dot" style={{ background: cat?.color || '#9d9dba' }}></span>
+                                            <span className="expense-page__mobile-card-name">
+                                                {cat ? `${cat.icon} ${cat.name}` : 'Không rõ'}
+                                            </span>
+                                        </div>
+                                        <span className="text-expense expense-page__mobile-card-amount">
+                                            -{formatCurrency(tx.amount)}
+                                        </span>
+                                    </div>
+                                    {tx.note && (
+                                        <div className="expense-page__mobile-card-note text-secondary">
+                                            {tx.note}
+                                        </div>
+                                    )}
+                                    <div className="expense-page__mobile-card-footer">
+                                        <span className="text-secondary expense-page__mobile-card-date">
+                                            {formatDate(tx.createdAt)}
+                                        </span>
+                                        <div className="expense-page__mobile-card-actions">
+                                            <button className="btn-icon btn-ghost btn-sm" onClick={() => handleEdit(tx)} title="Sửa">
+                                                <Pencil size={16} />
+                                            </button>
+                                            <button className="btn-icon btn-ghost btn-sm" onClick={() => handleDelete(tx.id)} title="Xóa" style={{ color: 'var(--danger)' }}>
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+
                     {/* Pagination */}
                     {totalPages > 1 && (
                         <div className="expense-page__pagination">
@@ -308,6 +354,15 @@ export default function Expense({ transactions, categories, addTransaction, upda
                     </div>
                 </div>
             )}
+
+            {/* Floating Action Button - Mobile */}
+            <button 
+                className="expense-page__fab"
+                onClick={() => { setEditTx(null); setShowModal(true) }}
+                title="Thêm chi tiêu"
+            >
+                <Plus size={24} />
+            </button>
 
             {/* Modal */}
             <Modal

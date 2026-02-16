@@ -133,7 +133,7 @@ export default function Income({ transactions, categories, addTransaction, updat
                         Tổng thu nhập: <span className="text-income">{formatCurrency(totalAmount)}</span>
                     </p>
                 </div>
-                <button className="btn btn-primary" onClick={() => { setEditTx(null); setShowModal(true) }}>
+                <button className="btn btn-primary income-page__add-btn" onClick={() => { setEditTx(null); setShowModal(true) }}>
                     <Plus size={16} /> Thêm thu nhập
                 </button>
             </div>
@@ -166,21 +166,27 @@ export default function Income({ transactions, categories, addTransaction, updat
                     {/* Date Range Filter */}
                     <div className="income-page__date-filter">
                         <Calendar size={16} className="income-page__date-icon" />
-                        <input
-                            type="date"
-                            className="form-input income-page__date-input"
-                            value={dateFrom}
-                            onChange={e => { setDateFrom(e.target.value); setPage(1) }}
-                            placeholder="Từ ngày"
-                        />
-                        <span className="income-page__date-separator">→</span>
-                        <input
-                            type="date"
-                            className="form-input income-page__date-input"
-                            value={dateTo}
-                            onChange={e => { setDateTo(e.target.value); setPage(1) }}
-                            placeholder="Đến ngày"
-                        />
+                        <div className="income-page__date-inputs">
+                            <div className="income-page__date-input-wrapper">
+                                <label className="income-page__date-label">Từ ngày</label>
+                                <input
+                                    type="date"
+                                    className="form-input income-page__date-input"
+                                    value={dateFrom}
+                                    onChange={e => { setDateFrom(e.target.value); setPage(1) }}
+                                />
+                            </div>
+                            <span className="income-page__date-separator">→</span>
+                            <div className="income-page__date-input-wrapper">
+                                <label className="income-page__date-label">Đến ngày</label>
+                                <input
+                                    type="date"
+                                    className="form-input income-page__date-input"
+                                    value={dateTo}
+                                    onChange={e => { setDateTo(e.target.value); setPage(1) }}
+                                />
+                            </div>
+                        </div>
                         {(dateFrom || dateTo) && (
                             <button
                                 className="btn-icon btn-ghost income-page__date-clear"
@@ -222,10 +228,10 @@ export default function Income({ transactions, categories, addTransaction, updat
                 </div>
             </div>
 
-            {/* Table */}
+            {/* Table - Desktop */}
             {paginated.length > 0 ? (
                 <>
-                    <div className="table-container animate-fade-in-up">
+                    <div className="table-container animate-fade-in-up income-page__table-desktop">
                         <table className="table">
                             <thead>
                                 <tr>
@@ -271,6 +277,46 @@ export default function Income({ transactions, categories, addTransaction, updat
                         </table>
                     </div>
 
+                    {/* Mobile Card Layout */}
+                    <div className="income-page__mobile-list">
+                        {paginated.map(tx => {
+                            const cat = getCat(tx.category)
+                            return (
+                                <div key={tx.id} className="income-page__mobile-card">
+                                    <div className="income-page__mobile-card-header">
+                                        <div className="income-page__mobile-card-category">
+                                            <span className="category-tag__dot" style={{ background: cat?.color || '#9d9dba' }}></span>
+                                            <span className="income-page__mobile-card-name">
+                                                {cat ? `${cat.icon} ${cat.name}` : 'Không rõ'}
+                                            </span>
+                                        </div>
+                                        <span className="text-income income-page__mobile-card-amount">
+                                            +{formatCurrency(tx.amount)}
+                                        </span>
+                                    </div>
+                                    {tx.note && (
+                                        <div className="income-page__mobile-card-note text-secondary">
+                                            {tx.note}
+                                        </div>
+                                    )}
+                                    <div className="income-page__mobile-card-footer">
+                                        <span className="text-secondary income-page__mobile-card-date">
+                                            {formatDate(tx.createdAt)}
+                                        </span>
+                                        <div className="income-page__mobile-card-actions">
+                                            <button className="btn-icon btn-ghost btn-sm" onClick={() => handleEdit(tx)} title="Sửa">
+                                                <Pencil size={16} />
+                                            </button>
+                                            <button className="btn-icon btn-ghost btn-sm" onClick={() => handleDelete(tx.id)} title="Xóa" style={{ color: 'var(--danger)' }}>
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+
                     {/* Pagination */}
                     {totalPages > 1 && (
                         <div className="income-page__pagination">
@@ -308,6 +354,15 @@ export default function Income({ transactions, categories, addTransaction, updat
                     </div>
                 </div>
             )}
+
+            {/* Floating Action Button - Mobile */}
+            <button 
+                className="income-page__fab"
+                onClick={() => { setEditTx(null); setShowModal(true) }}
+                title="Thêm thu nhập"
+            >
+                <Plus size={24} />
+            </button>
 
             {/* Modal */}
             <Modal

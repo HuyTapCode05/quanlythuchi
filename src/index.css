@@ -198,6 +198,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  padding-bottom: 0;
+  margin-bottom: 0;
 }
 
 a {
@@ -928,12 +930,12 @@ img {
   /* Safe area for iPhone notch */
   @supports (padding: max(0px)) {
     .layout__content {
-      padding-bottom: max(var(--space-md), env(safe-area-inset-bottom));
+      padding-bottom: calc(var(--space-md) + 60px + max(0px, env(safe-area-inset-bottom)));
     }
 
     .bottom-nav {
       padding-bottom: max(0px, env(safe-area-inset-bottom));
-      height: calc(60px + env(safe-area-inset-bottom));
+      min-height: calc(60px + max(0px, env(safe-area-inset-bottom)));
     }
   }
 }

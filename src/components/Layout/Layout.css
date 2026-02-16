@@ -203,6 +203,7 @@
 
     .layout__content {
         padding: var(--space-md);
-        padding-bottom: calc(var(--space-md) + 60px); /* Space for bottom nav */
+        padding-bottom: calc(var(--space-md) + 60px + env(safe-area-inset-bottom)); /* Space for bottom nav + safe area */
+        margin-bottom: 0;
     }
 }

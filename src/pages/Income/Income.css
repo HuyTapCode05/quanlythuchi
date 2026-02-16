@@ -10,6 +10,11 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: var(--space-lg);
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(0, 206, 201, 0.05));
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    margin-bottom: var(--space-md);
 }
 
 .income-page__title {
@@ -19,12 +24,26 @@
     font-size: var(--fs-2xl);
     font-weight: var(--fw-bold);
     color: var(--text-heading);
+    margin: 0;
+}
+
+.income-page__title svg {
+    color: var(--income-color);
+    filter: drop-shadow(0 2px 4px rgba(0, 184, 148, 0.3));
 }
 
 .income-page__subtitle {
-    font-size: var(--fs-sm);
+    font-size: var(--fs-base);
     color: var(--text-secondary);
-    margin-top: var(--space-xs);
+    margin-top: var(--space-sm);
+    font-weight: var(--fw-medium);
+}
+
+.income-page__subtitle .text-income {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-bold);
+    color: var(--income-color);
+    text-shadow: 0 2px 8px rgba(0, 184, 148, 0.2);
 }
 
 .income-page__toolbar {
@@ -52,6 +71,17 @@
     max-width: 320px;
 }
 
+.income-page__search .form-input {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-base);
+}
+
+.income-page__search .form-input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-glow);
+}
+
 .income-page__search-icon {
     position: absolute;
     left: 12px;
@@ -66,6 +96,14 @@
 .income-page__filter-select {
     min-width: 140px;
     max-width: 180px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-base);
+}
+
+.income-page__filter-select:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-primary-glow);
 }
 
 .income-page__date-filter {
@@ -75,8 +113,15 @@
     position: relative;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+}
+
+.income-page__date-filter:hover {
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow-md);
 }
 
 .income-page__date-inputs {
@@ -144,8 +189,24 @@
 .income-page__date-presets {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
+    gap: var(--space-sm);
     flex-wrap: wrap;
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--divider);
+}
+
+.income-page__date-presets .btn {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-fast);
+}
+
+.income-page__date-presets .btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .income-page__actions {
@@ -179,9 +240,28 @@
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: var(--space-md);
-    transition: all var(--transition-fast);
+    padding: var(--space-lg);
+    transition: all var(--transition-base);
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.income-page__mobile-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--income-color), var(--income-color-light));
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.income-page__mobile-card:hover::before {
+    opacity: 1;
 }
 
 .income-page__mobile-card:active {
@@ -190,8 +270,9 @@
 }
 
 .income-page__mobile-card:hover {
-    border-color: var(--border-hover);
-    box-shadow: var(--shadow-sm);
+    border-color: var(--income-color);
+    box-shadow: 0 4px 16px rgba(0, 184, 148, 0.15);
+    transform: translateY(-2px);
 }
 
 .income-page__mobile-card-header {
@@ -220,10 +301,15 @@
 }
 
 .income-page__mobile-card-amount {
-    font-size: var(--fs-lg);
+    font-size: var(--fs-xl);
     font-weight: var(--fw-bold);
     white-space: nowrap;
     flex-shrink: 0;
+    background: linear-gradient(135deg, var(--income-color), var(--income-color-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 4px rgba(0, 184, 148, 0.2));
 }
 
 .income-page__mobile-card-note {
@@ -262,27 +348,37 @@
     position: fixed;
     bottom: calc(60px + var(--space-lg) + env(safe-area-inset-bottom));
     right: var(--space-lg);
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-hover));
+    background: linear-gradient(135deg, var(--income-color), var(--income-color-light));
     color: white;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 8px 24px rgba(0, 184, 148, 0.4), 0 0 0 4px rgba(0, 184, 148, 0.1);
     z-index: 90;
     align-items: center;
     justify-content: center;
     transition: all var(--transition-base);
     border: none;
     cursor: pointer;
+    animation: pulse-fab 2s ease-in-out infinite;
+}
+
+@keyframes pulse-fab {
+    0%, 100% {
+        box-shadow: 0 8px 24px rgba(0, 184, 148, 0.4), 0 0 0 4px rgba(0, 184, 148, 0.1);
+    }
+    50% {
+        box-shadow: 0 8px 32px rgba(0, 184, 148, 0.6), 0 0 0 8px rgba(0, 184, 148, 0.15);
+    }
 }
 
 .income-page__fab:hover {
-    transform: scale(1.1);
-    box-shadow: 0 8px 24px rgba(108, 92, 231, 0.5);
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 12px 32px rgba(0, 184, 148, 0.5);
 }
 
 .income-page__fab:active {
-    transform: scale(0.95);
+    transform: scale(0.95) rotate(90deg);
 }
 
 @media (max-width: 768px) {

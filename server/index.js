@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import Database from 'better-sqlite3'
@@ -144,6 +145,79 @@ app.post('/api/users/login', (req, res) => {
         }
         
         res.json(user)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+// Lấy thông tin user theo id (dùng để validate phiên đăng nhập localStorage)
+app.get('/api/users/:id', (req, res) => {
+    try {
+        const { id } = req.params
+        const stmt = db.prepare('SELECT id, name, email FROM users WHERE id = ?')
+        const user = stmt.get(id)
+        if (!user) {
+            return res.status(404).json({ error: 'Không tìm thấy người dùng' })
+        }
+        res.json(user)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+// Cập nhật thông tin tài khoản (tên, email)
+app.put('/api/users/:id/profile', (req, res) => {
+    try {
+        const { id } = req.params
+        const { name, email } = req.body
+
+        if (!name || !email) {
+            return res.status(400).json({ error: 'Thiếu tên hoặc email' })
+        }
+
+        // Kiểm tra email trùng với user khác
+        const existing = db.prepare('SELECT id FROM users WHERE email = ? AND id <> ?').get(email, id)
+        if (existing) {
+            return res.status(400).json({ error: 'Email đã được sử dụng bởi tài khoản khác' })
+        }
+
+        const stmt = db.prepare('UPDATE users SET name = ?, email = ? WHERE id = ?')
+        const result = stmt.run(name, email, id)
+        if (result.changes === 0) {
+            return res.status(404).json({ error: 'Không tìm thấy người dùng' })
+        }
+
+        res.json({ id, name, email })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+// Đổi mật khẩu (cần mật khẩu hiện tại)
+app.put('/api/users/:id/password', (req, res) => {
+    try {
+        const { id } = req.params
+        const { currentPassword, newPassword } = req.body
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ error: 'Thiếu mật khẩu hiện tại hoặc mật khẩu mới' })
+        }
+        if (newPassword.length < 6) {
+            return res.status(400).json({ error: 'Mật khẩu mới phải có ít nhất 6 ký tự' })
+        }
+
+        const user = db.prepare('SELECT id, password FROM users WHERE id = ?').get(id)
+        if (!user) {
+            return res.status(404).json({ error: 'Không tìm thấy người dùng' })
+        }
+        if (user.password !== currentPassword) {
+            return res.status(400).json({ error: 'Mật khẩu hiện tại không đúng' })
+        }
+
+        const stmt = db.prepare('UPDATE users SET password = ? WHERE id = ?')
+        stmt.run(newPassword, id)
+
+        res.json({ success: true })
     } catch (error) {
         res.status(500).json({ error: error.message })
     }
@@ -378,7 +452,7 @@ app.post('/api/recurring/send-reminders', async (req, res) => {
         const userStmt = db.prepare('SELECT email, name FROM users WHERE id = ?')
         const user = userStmt.get(userId)
         if (!user) {
-            return res.status(404).json({ error: 'Không tìm thấy người dùng' })
+            return res.status(401).json({ error: 'Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.' })
         }
 
         const today = new Date()

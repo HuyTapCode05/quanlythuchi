@@ -28,6 +28,41 @@ export const api = {
         return res.json()
     },
 
+    getUser: async (userId) => {
+        const res = await fetch(`${API_URL}/users/${userId}`)
+        const json = await res.json().catch(() => ({}))
+        if (!res.ok) {
+            throw new Error(json.error || 'Không thể tải thông tin người dùng')
+        }
+        return json
+    },
+
+    updateProfile: async (userId, data) => {
+        const res = await fetch(`${API_URL}/users/${userId}/profile`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        const json = await res.json().catch(() => ({}))
+        if (!res.ok) {
+            throw new Error(json.error || 'Lỗi khi cập nhật tài khoản')
+        }
+        return json
+    },
+
+    changePassword: async (userId, currentPassword, newPassword) => {
+        const res = await fetch(`${API_URL}/users/${userId}/password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword, newPassword })
+        })
+        const json = await res.json().catch(() => ({}))
+        if (!res.ok) {
+            throw new Error(json.error || 'Lỗi khi đổi mật khẩu')
+        }
+        return json
+    },
+
     // Categories
     getCategories: async (userId) => {
         const res = await fetch(`${API_URL}/categories/${userId}`)

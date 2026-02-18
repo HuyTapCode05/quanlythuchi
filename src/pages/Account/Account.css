@@ -1,0 +1,90 @@
+.account-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.account-page__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+}
+
+.account-page__title {
+    font-size: var(--fs-2xl);
+    font-weight: var(--fw-bold);
+    color: var(--text-heading);
+}
+
+.account-page__subtitle {
+    font-size: var(--fs-sm);
+    color: var(--text-secondary);
+    margin-top: var(--space-xs);
+}
+
+.account-page__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-lg);
+}
+
+.account-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.account-card__title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-semibold);
+    color: var(--text-heading);
+}
+
+.account-card__desc {
+    font-size: var(--fs-xs);
+    color: var(--text-secondary);
+}
+
+.account-input__wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.account-input__icon {
+    position: absolute;
+    left: 10px;
+    color: var(--text-muted);
+}
+
+.account-input {
+    padding-left: 34px !important;
+}
+
+@media (max-width: 768px) {
+    .account-page {
+        gap: var(--space-md);
+    }
+
+    .account-page__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .account-page__title {
+        font-size: var(--fs-xl);
+    }
+
+    .account-card {
+        padding: var(--space-md);
+    }
+}
+
+

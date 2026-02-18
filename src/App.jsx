@@ -8,6 +8,7 @@ import Budget from './pages/Budget/Budget'
 import Savings from './pages/Savings/Savings'
 import Statistics from './pages/Statistics/Statistics'
 import Categories from './pages/Categories/Categories'
+import Account from './pages/Account/Account'
 import { useTransactions } from './hooks/useTransactions'
 import { useCategories } from './hooks/useCategories'
 import { useBudgets } from './hooks/useBudgets'
@@ -230,6 +231,10 @@ export default function App() {
                             deleteCategory={deleteCategory}
                         />
                     }
+                />
+                <Route
+                    path="/account"
+                    element={<Account />}
                 />
             </Route>
         </Routes>

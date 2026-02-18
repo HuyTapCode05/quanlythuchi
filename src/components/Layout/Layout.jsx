@@ -31,6 +31,10 @@ export default function Layout({ onExportData, onImportData }) {
         }
     }
 
+    const goToAccount = () => {
+        navigate('/account')
+    }
+
     const handleClickImport = () => {
         if (!onImportData) return
         fileInputRef.current?.click()
@@ -135,8 +139,8 @@ export default function Layout({ onExportData, onImportData }) {
                         </button>
                         <button
                             className="layout__avatar"
-                            onClick={handleLogout}
-                            title={user ? `Đăng xuất (${user.name || user.email})` : 'Đăng xuất'}
+                            onClick={goToAccount}
+                            title={user ? `Tài khoản (${user.name || user.email})` : 'Tài khoản'}
                         >
                             <span>
                                 {(user?.name || user?.email || 'U')[0].toUpperCase()}

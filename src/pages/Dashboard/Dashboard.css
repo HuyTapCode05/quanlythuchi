@@ -11,6 +11,257 @@
     gap: var(--space-lg);
 }
 
+/* Recurring alert */
+.dashboard__recurring-alert {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    background: radial-gradient(circle at top left, rgba(0, 184, 148, 0.18), transparent 55%),
+        radial-gradient(circle at top right, rgba(255, 107, 107, 0.16), transparent 55%),
+        var(--bg-card);
+    box-shadow: var(--shadow-sm);
+}
+
+.dashboard__recurring-alert-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+.dashboard__recurring-alert-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.dashboard__recurring-alert-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 193, 7, 0.18);
+    color: #ffc107;
+}
+
+.dashboard__recurring-alert-title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--text-heading);
+}
+
+.dashboard__recurring-alert-sub {
+    font-size: var(--fs-xs);
+    color: var(--text-secondary);
+}
+
+.dashboard__recurring-alert-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-xs);
+    color: var(--accent-primary);
+    text-decoration: none;
+}
+
+.dashboard__recurring-alert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dashboard__recurring-alert-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    font-size: var(--fs-xs);
+}
+
+.dashboard__recurring-alert-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex: 1;
+    min-width: 0;
+}
+
+.dashboard__recurring-alert-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.dashboard__recurring-alert-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.dashboard__recurring-alert-name {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--text-heading);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dashboard__recurring-alert-meta {
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dashboard__recurring-alert-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.dashboard__recurring-alert-amount {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.dashboard__recurring-alert-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+/* Month Compare */
+.dashboard__month-compare {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    background: radial-gradient(circle at top left, rgba(0, 184, 148, 0.18), transparent 55%),
+        radial-gradient(circle at top right, rgba(255, 107, 107, 0.16), transparent 55%),
+        var(--bg-card);
+    box-shadow: var(--shadow-sm);
+}
+
+.dashboard__month-compare-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dashboard__month-compare-title {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--text-heading);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.dashboard__month-compare-sub {
+    font-size: var(--fs-xs);
+    color: var(--text-secondary);
+}
+
+.dashboard__month-compare-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-md);
+}
+
+.dashboard__month-compare-item {
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.dashboard__month-compare-item--income {
+    background: linear-gradient(135deg, rgba(0, 184, 148, 0.12), rgba(0, 184, 148, 0.02));
+}
+
+.dashboard__month-compare-item--expense {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.12), rgba(255, 107, 107, 0.02));
+}
+
+.dashboard__month-compare-label {
+    font-size: var(--fs-xs);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.dashboard__month-compare-values {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dashboard__month-compare-current {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+    color: var(--text-heading);
+}
+
+.dashboard__month-compare-prev {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+}
+
+.dashboard__month-compare-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-xs);
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.18);
+}
+
+.dashboard__month-compare-change svg {
+    flex-shrink: 0;
+}
+
+.dashboard__month-compare-change.is-up {
+    color: var(--income-color);
+}
+
+.dashboard__month-compare-change.is-down {
+    color: var(--expense-color);
+}
+
+.dashboard__month-compare-chip {
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.dashboard__month-compare-note {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+}
+
 /* Charts Grid */
 .dashboard__charts {
     display: grid;
@@ -130,6 +381,14 @@
 @media (max-width: 768px) {
     .dashboard {
         gap: var(--space-md);
+    }
+
+    .dashboard__month-compare {
+        padding: var(--space-md);
+    }
+
+    .dashboard__month-compare-grid {
+        grid-template-columns: 1fr;
     }
 
     .dashboard__stats {

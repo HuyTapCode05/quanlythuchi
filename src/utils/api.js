@@ -177,6 +177,19 @@ export const api = {
         return res.json()
     },
 
+    sendRecurringReminders: async (userId) => {
+        const res = await fetch(`${API_URL}/recurring/send-reminders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId })
+        })
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) {
+            throw new Error(data.error || 'Lỗi khi gửi email nhắc giao dịch định kỳ')
+        }
+        return data
+    },
+
     // Savings Goals
     getSavingsGoals: async (userId) => {
         const res = await fetch(`${API_URL}/savings/${userId}`)

@@ -1,6 +1,6 @@
 import {
     TrendingUp, TrendingDown, Wallet, ArrowRight,
-    Plus
+    Plus, ArrowUpRight, ArrowDownRight, BellRing
 } from 'lucide-react'
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'
 import { formatCurrency, getRelativeTime, CHART_COLORS } from '../../utils/helpers'
 import './Dashboard.css'
 
-export default function Dashboard({ transactions, categories, totalIncome, totalExpense, balance, getMonthlyData, getCategoryBreakdown }) {
+export default function Dashboard({ transactions, categories, totalIncome, totalExpense, balance, getMonthlyData, getCategoryBreakdown, recurring = [] }) {
     const monthlyData = getMonthlyData()
     const catBreakdown = getCategoryBreakdown('expense')
     const recentTx = transactions.slice(0, 6)
@@ -31,8 +31,198 @@ export default function Dashboard({ transactions, categories, totalIncome, total
         )
     }
 
+    // So sánh tháng này với tháng trước
+    const getMonthStats = (year, month) => {
+        let income = 0
+        let expense = 0
+        transactions.forEach(tx => {
+            const d = new Date(tx.createdAt)
+            if (d.getFullYear() === year && d.getMonth() === month) {
+                if (tx.type === 'income') income += tx.amount
+                if (tx.type === 'expense') expense += tx.amount
+            }
+        })
+        return { income, expense }
+    }
+
+    const now = new Date()
+    const currentStats = getMonthStats(now.getFullYear(), now.getMonth())
+    const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const prevStats = getMonthStats(prevDate.getFullYear(), prevDate.getMonth())
+
+    const calcChange = (current, previous) => {
+        if (!previous) return null
+        if (previous === 0 && current === 0) return 0
+        if (previous === 0) return null // Không tính % khi tháng trước = 0 nhưng tháng này có giao dịch
+        return ((current - previous) / previous) * 100
+    }
+
+    const incomeChange = calcChange(currentStats.income, prevStats.income)
+    const expenseChange = calcChange(currentStats.expense, prevStats.expense)
+
+    // Nhắc nhở định kỳ sắp đến hạn
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const diffInDays = (dateStr) => {
+        if (!dateStr) return null
+        const d = new Date(dateStr)
+        d.setHours(0, 0, 0, 0)
+        const diffMs = d.getTime() - today.getTime()
+        return Math.round(diffMs / (1000 * 60 * 60 * 24))
+    }
+
+    const upcomingRecurring = Array.isArray(recurring)
+        ? recurring
+            .filter(r => r.isActive === 1)
+            .map(r => {
+                const next = r.nextDate || r.next_date
+                const days = diffInDays(next)
+                return { ...r, _daysUntilNext: days }
+            })
+            .filter(r => r._daysUntilNext !== null && r._daysUntilNext <= 3)
+            .sort((a, b) => (a._daysUntilNext ?? 0) - (b._daysUntilNext ?? 0))
+            .slice(0, 4)
+        : []
+
     return (
         <div className="dashboard">
+            {/* Recurring Alerts */}
+            {upcomingRecurring.length > 0 && (
+                <div className="dashboard__recurring-alert animate-fade-in-up">
+                    <div className="dashboard__recurring-alert-header">
+                        <div className="dashboard__recurring-alert-title-wrap">
+                            <div className="dashboard__recurring-alert-icon">
+                                <BellRing size={16} />
+                            </div>
+                            <div>
+                                <p className="dashboard__recurring-alert-title">
+                                    Nhắc nhở định kỳ
+                                </p>
+                                <p className="dashboard__recurring-alert-sub">
+                                    Có {upcomingRecurring.length} giao dịch định kỳ sắp đến hạn trong 3 ngày tới
+                                </p>
+                            </div>
+                        </div>
+                        <Link to="/recurring" className="dashboard__recurring-alert-link">
+                            Xem tất cả
+                            <ArrowRight size={14} />
+                        </Link>
+                    </div>
+                    <div className="dashboard__recurring-alert-list">
+                        {upcomingRecurring.map(item => {
+                            const cat = categories.find(c => c.id === (item.categoryId || item.category_id))
+                            const days = item._daysUntilNext ?? 0
+                            const label = days < 0
+                                ? 'Đã quá hạn'
+                                : days === 0
+                                    ? 'Hôm nay'
+                                    : `Còn ${days} ngày`
+                            return (
+                                <div key={item.id} className="dashboard__recurring-alert-item">
+                                    <div className="dashboard__recurring-alert-left">
+                                        <div
+                                            className="dashboard__recurring-alert-avatar"
+                                            style={{ background: cat?.color ? `${cat.color}22` : 'var(--bg-input)' }}
+                                        >
+                                            <span>{cat?.icon || '🔁'}</span>
+                                        </div>
+                                        <div className="dashboard__recurring-alert-text">
+                                            <p className="dashboard__recurring-alert-name">
+                                                {cat ? `${cat.icon} ${cat.name}` : 'Giao dịch định kỳ'}
+                                            </p>
+                                            <p className="dashboard__recurring-alert-meta">
+                                                {item.note || (item.type === 'income' ? 'Thu nhập định kỳ' : 'Chi tiêu định kỳ')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="dashboard__recurring-alert-right">
+                                        <p className={`dashboard__recurring-alert-amount ${item.type === 'income' ? 'text-income' : 'text-expense'}`}>
+                                            {item.type === 'income' ? '+' : '-'}{formatCurrency(item.amount)}
+                                        </p>
+                                        <span className="dashboard__recurring-alert-badge">
+                                            {label}
+                                        </span>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* Month Compare Banner */}
+            <div className="dashboard__month-compare animate-fade-in-up">
+                <div className="dashboard__month-compare-header">
+                    <span className="dashboard__month-compare-title">So với tháng trước</span>
+                    <span className="dashboard__month-compare-sub">
+                        Tháng này so với {`T${prevDate.getMonth() + 1}/${prevDate.getFullYear()}`}
+                    </span>
+                </div>
+                <div className="dashboard__month-compare-grid">
+                    <div className="dashboard__month-compare-item dashboard__month-compare-item--income">
+                        <div className="dashboard__month-compare-label">
+                            <span>Thu nhập</span>
+                        </div>
+                        <div className="dashboard__month-compare-values">
+                            <span className="dashboard__month-compare-current">
+                                {formatCurrency(currentStats.income)}
+                            </span>
+                            <span className="dashboard__month-compare-prev">
+                                Tháng trước: {formatCurrency(prevStats.income)}
+                            </span>
+                        </div>
+                        {incomeChange !== null && (
+                            <div className={`dashboard__month-compare-change ${incomeChange >= 0 ? 'is-up' : 'is-down'}`}>
+                                {incomeChange >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                                <span>
+                                    {incomeChange > 0 ? '+' : ''}{incomeChange.toFixed(1)}%
+                                </span>
+                                <span className="dashboard__month-compare-chip">
+                                    {incomeChange >= 0 ? 'Thu tăng' : 'Thu giảm'}
+                                </span>
+                            </div>
+                        )}
+                        {incomeChange === null && (
+                            <div className="dashboard__month-compare-note">
+                                Chưa đủ dữ liệu để so sánh.
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="dashboard__month-compare-item dashboard__month-compare-item--expense">
+                        <div className="dashboard__month-compare-label">
+                            <span>Chi tiêu</span>
+                        </div>
+                        <div className="dashboard__month-compare-values">
+                            <span className="dashboard__month-compare-current text-expense">
+                                {formatCurrency(currentStats.expense)}
+                            </span>
+                            <span className="dashboard__month-compare-prev">
+                                Tháng trước: {formatCurrency(prevStats.expense)}
+                            </span>
+                        </div>
+                        {expenseChange !== null && (
+                            <div className={`dashboard__month-compare-change ${expenseChange <= 0 ? 'is-up' : 'is-down'}`}>
+                                {/* Với chi tiêu: giảm là tốt (màu xanh, mũi tên xuống) */}
+                                {expenseChange <= 0 ? <ArrowDownRight size={14} /> : <ArrowUpRight size={14} />}
+                                <span>
+                                    {expenseChange > 0 ? '+' : ''}{expenseChange.toFixed(1)}%
+                                </span>
+                                <span className="dashboard__month-compare-chip">
+                                    {expenseChange <= 0 ? 'Chi giảm' : 'Chi tăng'}
+                                </span>
+                            </div>
+                        )}
+                        {expenseChange === null && (
+                            <div className="dashboard__month-compare-note">
+                                Chưa đủ dữ liệu để so sánh.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
             {/* Stat Cards */}
             <div className="dashboard__stats">
                 <div className="stat-card income animate-fade-in-up" style={{ animationDelay: '0ms' }}>

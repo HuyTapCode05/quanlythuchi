@@ -71,7 +71,6 @@ export function useTransactions() {
     }, [user?.id])
 
     const updateTransaction = useCallback(async (id, data) => {
-        // Convert date to ISO string if provided
         let createdAt = data.createdAt || new Date().toISOString()
         if (data.date) {
             const dateObj = new Date(data.date)

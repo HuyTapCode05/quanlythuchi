@@ -68,6 +68,16 @@
     opacity: 0.6;
 }
 
+.recurring-item--due-soon {
+    border-color: rgba(255, 193, 7, 0.6);
+    box-shadow: 0 0 0 1px rgba(255, 193, 7, 0.4);
+}
+
+.recurring-item--overdue {
+    border-color: rgba(255, 107, 107, 0.8);
+    box-shadow: 0 0 0 1px rgba(255, 107, 107, 0.5);
+}
+
 .recurring-item__main {
     display: flex;
     align-items: center;
@@ -147,6 +157,23 @@
 .recurring-item__next {
     color: var(--text-heading) !important;
     font-weight: var(--fw-semibold);
+}
+
+.recurring-item__chip {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+.recurring-item__chip--soon {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+}
+
+.recurring-item__chip--overdue {
+    background: rgba(255, 107, 107, 0.18);
+    color: var(--expense-color);
 }
 
 .recurring-item__note {

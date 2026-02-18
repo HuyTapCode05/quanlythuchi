@@ -143,6 +143,7 @@ export default function App() {
                             balance={balance}
                             getMonthlyData={getMonthlyData}
                             getCategoryBreakdown={getCategoryBreakdown}
+                            recurring={recurring}
                         />
                     }
                 />

@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import Database from 'better-sqlite3'
+import nodemailer from 'nodemailer'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 
@@ -17,6 +18,28 @@ app.use(express.json())
 // Database setup
 const dbPath = join(__dirname, 'fintrack.db')
 const db = new Database(dbPath)
+
+// Mail setup (optional - chỉ chạy khi có cấu hình SMTP)
+let mailTransporter = null
+if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    mailTransporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT || 587),
+        secure: false,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        }
+    })
+
+    mailTransporter.verify().then(() => {
+        console.log('📧 SMTP sẵn sàng gửi mail')
+    }).catch((err) => {
+        console.error('❌ SMTP verify lỗi:', err?.message || err)
+    })
+} else {
+    console.log('ℹ️ Không có cấu hình SMTP, API gửi mail sẽ trả về thông báo chưa cấu hình.')
+}
 
 // Initialize tables (without foreign keys for flexibility)
 db.exec(`
@@ -337,6 +360,78 @@ app.post('/api/recurring', (req, res) => {
     } catch (error) {
         console.error('Add recurring error:', error)
         res.status(500).json({ error: error.message || 'Lỗi không xác định' })
+    }
+})
+
+// Gửi email nhắc nhở giao dịch định kỳ
+app.post('/api/recurring/send-reminders', async (req, res) => {
+    try {
+        const { userId } = req.body
+        if (!userId) {
+            return res.status(400).json({ error: 'Thiếu userId' })
+        }
+
+        if (!mailTransporter) {
+            return res.status(500).json({ error: 'SMTP chưa được cấu hình trên server' })
+        }
+
+        const userStmt = db.prepare('SELECT email, name FROM users WHERE id = ?')
+        const user = userStmt.get(userId)
+        if (!user) {
+            return res.status(404).json({ error: 'Không tìm thấy người dùng' })
+        }
+
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const threeDays = new Date(today)
+        threeDays.setDate(today.getDate() + 3)
+
+        const startIso = today.toISOString().split('T')[0]
+        const endIso = threeDays.toISOString().split('T')[0]
+
+        const recurringStmt = db.prepare(`
+            SELECT *
+            FROM recurring_transactions
+            WHERE user_id = ?
+              AND is_active = 1
+              AND date(next_date) BETWEEN date(?) AND date(?)
+            ORDER BY next_date ASC
+        `)
+        const list = recurringStmt.all(userId, startIso, endIso)
+
+        if (!list.length) {
+            return res.json({ sent: false, message: 'Không có giao dịch định kỳ sắp đến hạn trong 3 ngày tới.' })
+        }
+
+        const lines = list.map((r) => {
+            const when = r.next_date || r.nextDate
+            const typeLabel = r.type === 'income' ? 'Thu' : 'Chi'
+            return `- ${typeLabel} ${r.amount} (${r.frequency}) - lần tới: ${when}${r.note ? ` - ${r.note}` : ''}`
+        })
+
+        const text = [
+            `Chào ${user.name || user.email},`,
+            '',
+            'Dưới đây là các giao dịch định kỳ sắp đến hạn trong 3 ngày tới:',
+            '',
+            ...lines,
+            '',
+            'Bạn có thể xem chi tiết tại mục "Giao dịch định kỳ" trong FinTrack.',
+            '',
+            '— FinTrack'
+        ].join('\n')
+
+        await mailTransporter.sendMail({
+            from: process.env.SMTP_FROM || process.env.SMTP_USER,
+            to: user.email,
+            subject: 'Nhắc nhở giao dịch định kỳ - FinTrack',
+            text
+        })
+
+        res.json({ sent: true, count: list.length, email: user.email })
+    } catch (error) {
+        console.error('Send recurring reminders error:', error)
+        res.status(500).json({ error: error.message || 'Lỗi khi gửi email nhắc nhở' })
     }
 })
 

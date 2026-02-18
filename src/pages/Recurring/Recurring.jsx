@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react'
-import { Plus, Pencil, Trash2, Repeat, Calendar, Power, PowerOff } from 'lucide-react'
+import { Plus, Pencil, Trash2, Repeat, Calendar, Power, PowerOff, Mail } from 'lucide-react'
 import Modal from '../../components/Modal'
 import { formatCurrency, formatDate } from '../../utils/helpers'
+import { api } from '../../utils/api'
+import { useAuth } from '../../hooks/useAuth'
 import './Recurring.css'
 
 const FREQUENCY_OPTIONS = [
@@ -14,6 +16,8 @@ const FREQUENCY_OPTIONS = [
 export default function Recurring({ recurring, categories, addRecurring, updateRecurring, deleteRecurring, toggleActive }) {
     const [showModal, setShowModal] = useState(false)
     const [editRecurring, setEditRecurring] = useState(null)
+    const [sendingEmail, setSendingEmail] = useState(false)
+    const { user } = useAuth()
     const [form, setForm] = useState({
         type: 'expense',
         amount: '',
@@ -25,7 +29,25 @@ export default function Recurring({ recurring, categories, addRecurring, updateR
         nextDate: new Date().toISOString().split('T')[0]
     })
 
-    const activeRecurring = recurring.filter(r => r.isActive === 1)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const diffInDays = (dateStr) => {
+        if (!dateStr) return null
+        const d = new Date(dateStr)
+        d.setHours(0, 0, 0, 0)
+        const diffMs = d.getTime() - today.getTime()
+        return Math.round(diffMs / (1000 * 60 * 60 * 24))
+    }
+
+    const activeRecurring = recurring
+        .filter(r => r.isActive === 1)
+        .map(r => {
+            const next = r.nextDate || r.next_date
+            const days = diffInDays(next)
+            return { ...r, _daysUntilNext: days }
+        })
+
     const inactiveRecurring = recurring.filter(r => r.isActive === 0)
 
     const getCategory = (id) => categories.find(c => c.id === id)
@@ -84,6 +106,27 @@ export default function Recurring({ recurring, categories, addRecurring, updateR
         toggleActive(id, !currentActive)
     }
 
+    const handleSendEmailReminders = async () => {
+        if (!user?.id) {
+            alert('Bạn cần đăng nhập để gửi email nhắc nhở.')
+            return
+        }
+        try {
+            setSendingEmail(true)
+            const result = await api.sendRecurringReminders(user.id)
+            if (result.sent) {
+                alert(`Đã gửi email nhắc ${result.count} giao dịch định kỳ tới ${result.email || 'email của bạn'}.`)
+            } else {
+                alert(result.message || 'Không có giao dịch định kỳ sắp đến hạn trong 3 ngày tới.')
+            }
+        } catch (error) {
+            console.error('Send reminders error:', error)
+            alert(error.message || 'Lỗi khi gửi email nhắc giao dịch định kỳ.')
+        } finally {
+            setSendingEmail(false)
+        }
+    }
+
     const filteredCategories = useMemo(() => 
         categories.filter(c => c.type === form.type),
         [categories, form.type]
@@ -109,6 +152,16 @@ export default function Recurring({ recurring, categories, addRecurring, updateR
                     <button className="btn btn-primary" onClick={() => openAdd('income')}>
                         <Plus size={16} /> Thu nhập định kỳ
                     </button>
+                    <button
+                        className="btn btn-ghost"
+                        type="button"
+                        onClick={handleSendEmailReminders}
+                        disabled={sendingEmail}
+                        title="Gửi email nhắc các giao dịch định kỳ sắp đến hạn"
+                    >
+                        <Mail size={16} />
+                        {sendingEmail ? 'Đang gửi...' : 'Gửi mail nhắc định kỳ'}
+                    </button>
                 </div>
             </div>
 
@@ -119,8 +172,14 @@ export default function Recurring({ recurring, categories, addRecurring, updateR
                     <div className="recurring-page__list">
                         {activeRecurring.map(item => {
                             const category = getCategory(item.categoryId || item.category_id)
+                            const days = item._daysUntilNext ?? null
+                            const isDueSoon = days !== null && days >= 0 && days <= 3
+                            const isOverdue = days !== null && days < 0
                             return (
-                                <div key={item.id} className="recurring-item recurring-item--active">
+                                <div
+                                    key={item.id}
+                                    className={`recurring-item recurring-item--active ${isDueSoon ? 'recurring-item--due-soon' : ''} ${isOverdue ? 'recurring-item--overdue' : ''}`}
+                                >
                                     <div className="recurring-item__main">
                                         <div className="recurring-item__category">
                                             <span 
@@ -165,6 +224,16 @@ export default function Recurring({ recurring, categories, addRecurring, updateR
                                             <span className="recurring-item__next">
                                                 Lần tới: {formatDate(item.nextDate || item.next_date)}
                                             </span>
+                                            {isDueSoon && !isOverdue && (
+                                                <span className="recurring-item__chip recurring-item__chip--soon">
+                                                    Sắp đến hạn
+                                                </span>
+                                            )}
+                                            {isOverdue && (
+                                                <span className="recurring-item__chip recurring-item__chip--overdue">
+                                                    Đã quá hạn
+                                                </span>
+                                            )}
                                         </div>
                                         {item.note && (
                                             <div className="recurring-item__note">{item.note}</div>

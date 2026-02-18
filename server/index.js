@@ -477,10 +477,22 @@ app.post('/api/recurring/send-reminders', async (req, res) => {
             return res.json({ sent: false, message: 'Không có giao dịch định kỳ sắp đến hạn trong 3 ngày tới.' })
         }
 
-        const lines = list.map((r) => {
-            const when = r.next_date || r.nextDate
+        const formatAmount = (value) =>
+            Number(value || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+
+        const formatDateShort = (iso) => {
+            if (!iso) return ''
+            const d = new Date(iso)
+            const dd = String(d.getDate()).padStart(2, '0')
+            const mm = String(d.getMonth() + 1).padStart(2, '0')
+            const yyyy = d.getFullYear()
+            return `${dd}/${mm}/${yyyy}`
+        }
+
+        const plainLines = list.map((r) => {
+            const when = formatDateShort(r.next_date || r.nextDate)
             const typeLabel = r.type === 'income' ? 'Thu' : 'Chi'
-            return `- ${typeLabel} ${r.amount} (${r.frequency}) - lần tới: ${when}${r.note ? ` - ${r.note}` : ''}`
+            return `- ${typeLabel} ${formatAmount(r.amount)} (${r.frequency}) - lần tới: ${when}${r.note ? ` - ${r.note}` : ''}`
         })
 
         const text = [
@@ -488,18 +500,123 @@ app.post('/api/recurring/send-reminders', async (req, res) => {
             '',
             'Dưới đây là các giao dịch định kỳ sắp đến hạn trong 3 ngày tới:',
             '',
-            ...lines,
+            ...plainLines,
             '',
-            'Bạn có thể xem chi tiết tại mục "Giao dịch định kỳ" trong FinTrack.',
+            'Bạn có thể xem chi tiết và chỉnh sửa tại mục "Giao dịch định kỳ" trong FinTrack.',
             '',
             '— FinTrack'
         ].join('\n')
+
+        const baseUrl = process.env.APP_URL || 'http://localhost:3000'
+
+        const htmlRows = list.map((r) => {
+            const when = formatDateShort(r.next_date || r.nextDate)
+            const typeLabel = r.type === 'income' ? 'Thu' : 'Chi'
+            const typeColor = r.type === 'income' ? '#00b894' : '#ff6b6b'
+            const freqMap = {
+                daily: 'Hằng ngày',
+                weekly: 'Hằng tuần',
+                monthly: 'Hằng tháng',
+                yearly: 'Hằng năm'
+            }
+            const freqLabel = freqMap[r.frequency] || r.frequency
+            return `
+                <tr>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-size:13px;">
+                        <span style="display:inline-block;padding:2px 8px;border-radius:999px;background:${typeColor}15;color:${typeColor};font-size:11px;font-weight:600;margin-right:6px;">
+                            ${typeLabel}
+                        </span>
+                        ${r.note ? `<span>${r.note}</span>` : `<span>${typeLabel} định kỳ</span>`}
+                    </td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-size:13px;color:#555;">
+                        ${freqLabel}
+                    </td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-size:13px;color:#555;">
+                        ${when}
+                    </td>
+                    <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-size:13px; text-align:right; color:${typeColor}; font-weight:600;">
+                        ${formatAmount(r.amount)}
+                    </td>
+                </tr>
+            `
+        }).join('')
+
+        const html = `
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Nhắc nhở giao dịch định kỳ - FinTrack</title>
+</head>
+<body style="margin:0;padding:0;background:#0f172a;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+            <td align="center" style="padding:24px 12px;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;background:#020617;border-radius:16px;border:1px solid #1f2937;box-shadow:0 12px 45px rgba(15,23,42,.7);overflow:hidden;">
+                    <tr>
+                        <td style="padding:20px 24px 16px 24px;border-bottom:1px solid #1f2937;">
+                            <div style="display:flex;align-items:center;">
+                                <div style="width:32px;height:32px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#22c55e);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;margin-right:8px;">
+                                    ₫
+                                </div>
+                                <div>
+                                    <div style="color:#e5e7eb;font-weight:600;font-size:14px;">FinTrack</div>
+                                    <div style="color:#9ca3af;font-size:11px;">Nhắc nhở giao dịch định kỳ</div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:20px 24px 8px 24px;color:#e5e7eb;font-size:14px;">
+                            <p style="margin:0 0 8px 0;">Chào ${user.name || user.email},</p>
+                            <p style="margin:0 0 12px 0;color:#9ca3af;font-size:13px;line-height:1.6;">
+                                Dưới đây là các <strong>giao dịch định kỳ</strong> của bạn sẽ diễn ra trong <strong>3 ngày tới</strong>.
+                                Bạn có thể kiểm tra lại để đảm bảo số dư tài khoản luôn sẵn sàng.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:0 16px 8px 16px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border-radius:12px;overflow:hidden;background:#020617;border:1px solid #1f2937;">
+                                <thead>
+                                    <tr style="background:#020617;">
+                                        <th align="left" style="padding:10px 12px;font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;">Giao dịch</th>
+                                        <th align="left" style="padding:10px 12px;font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;">Tần suất</th>
+                                        <th align="left" style="padding:10px 12px;font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;">Lần tới</th>
+                                        <th align="right" style="padding:10px 12px;font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;">Số tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${htmlRows}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:12px 24px 20px 24px;font-size:12px;color:#9ca3af;">
+                            <p style="margin:0 0 8px 0;">
+                                Bạn có thể xem và chỉnh sửa các giao dịch này tại mục
+                                <a href="${baseUrl}/recurring" style="color:#6366f1;text-decoration:none;">Giao dịch định kỳ</a> trong FinTrack.
+                            </p>
+                            <p style="margin:0;color:#4b5563;font-size:11px;">
+                                Email này được gửi tự động, vui lòng không trả lời trực tiếp. Nếu bạn không muốn nhận email nhắc nữa, bạn có thể tắt giao dịch định kỳ trong ứng dụng.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+        `
 
         await mailTransporter.sendMail({
             from: process.env.SMTP_FROM || process.env.SMTP_USER,
             to: user.email,
             subject: 'Nhắc nhở giao dịch định kỳ - FinTrack',
-            text
+            text,
+            html
         })
 
         res.json({ sent: true, count: list.length, email: user.email })

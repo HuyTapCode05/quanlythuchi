@@ -13,7 +13,26 @@ const app = express()
 const PORT = process.env.PORT || 3001
 
 // Middleware
-app.use(cors())
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://huytapcode05.github.io',
+]
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        // Allow non-browser requests (no Origin) like curl/postman/railway healthchecks
+        if (!origin) return callback(null, true)
+        if (allowedOrigins.includes(origin)) return callback(null, true)
+        return callback(new Error(`CORS blocked for origin: ${origin}`))
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 204,
+}
+
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 app.use(express.json())
 
 // Database setup

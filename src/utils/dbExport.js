@@ -2,14 +2,11 @@ let SQL = null
 
 const initSQL = async () => {
     if (!SQL) {
-        // Dynamic import sql.js browser version
-        const sqlJsModule = await import('sql.js/dist/sql-wasm-browser.js')
-        // sql.js exports can vary between bundlers/versions, so resolve defensively
+        // Dynamic import sql.js init function (works reliably with Vite)
+        const sqlJsModule = await import('sql.js')
         const initSqlJs =
-            (typeof sqlJsModule?.default?.default === 'function' && sqlJsModule.default.default) ||
             (typeof sqlJsModule?.default === 'function' && sqlJsModule.default) ||
             (typeof sqlJsModule?.initSqlJs === 'function' && sqlJsModule.initSqlJs) ||
-            (typeof sqlJsModule === 'function' && sqlJsModule) ||
             null
 
         if (!initSqlJs) {
@@ -17,8 +14,11 @@ const initSQL = async () => {
             throw new Error('Không thể khởi tạo SQL.js (initSqlJs không phải function).')
         }
 
+        // wasm is in /public, but on GitHub Pages it is served under BASE_URL
+        const base = (typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL) ? import.meta.env.BASE_URL : '/'
+
         SQL = await initSqlJs({
-            locateFile: (file) => `/sql-wasm.wasm`
+            locateFile: (file) => `${base}sql-wasm.wasm`
         })
     }
     return SQL

@@ -267,10 +267,12 @@
     }
 
     .layout__notif-panel {
-        right: auto;
-        left: 0;
-        width: calc(100vw - 24px);
-        margin: 0 12px;
+        position: fixed;
+        top: 64px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        margin: 0;
     }
 
     .layout__avatar {

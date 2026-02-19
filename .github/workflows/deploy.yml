@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
       
       - name: Install system dependencies
@@ -37,7 +37,9 @@ jobs:
           sudo apt-get install -y build-essential python3
       
       - name: Install dependencies
-        run: npm ci
+        # This repo contains backend native deps (e.g. better-sqlite3) that are not needed for frontend build.
+        # Skipping install scripts avoids node-gyp/native builds on GitHub Pages workflow.
+        run: npm ci --ignore-scripts
       
       - name: Build
         run: npm run build

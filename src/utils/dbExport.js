@@ -4,7 +4,19 @@ const initSQL = async () => {
     if (!SQL) {
         // Dynamic import sql.js browser version
         const sqlJsModule = await import('sql.js/dist/sql-wasm-browser.js')
-        const initSqlJs = sqlJsModule.default || sqlJsModule
+        // sql.js exports can vary between bundlers/versions, so resolve defensively
+        const initSqlJs =
+            (typeof sqlJsModule?.default?.default === 'function' && sqlJsModule.default.default) ||
+            (typeof sqlJsModule?.default === 'function' && sqlJsModule.default) ||
+            (typeof sqlJsModule?.initSqlJs === 'function' && sqlJsModule.initSqlJs) ||
+            (typeof sqlJsModule === 'function' && sqlJsModule) ||
+            null
+
+        if (!initSqlJs) {
+            console.error('sql.js module export shape:', sqlJsModule)
+            throw new Error('Không thể khởi tạo SQL.js (initSqlJs không phải function).')
+        }
+
         SQL = await initSqlJs({
             locateFile: (file) => `/sql-wasm.wasm`
         })

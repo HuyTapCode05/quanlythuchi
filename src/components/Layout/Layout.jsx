@@ -15,10 +15,11 @@ const pageTitles = {
     '/backup': 'Backup / Restore',
 }
 
-export default function Layout({ onExportData, onImportData }) {
+export default function Layout({ onExportData, onImportData, notifications = [] }) {
     const [collapsed, setCollapsed] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
     const [searchValue, setSearchValue] = useState('')
+    const [notifOpen, setNotifOpen] = useState(false)
     const { user, logout } = useAuth()
     const { theme, toggleTheme } = useTheme()
     const navigate = useNavigate()
@@ -26,8 +27,10 @@ export default function Layout({ onExportData, onImportData }) {
     const location = useLocation()
 
     const title = pageTitles[location.pathname] || 'FinTrack'
+    const hasNotifications = Array.isArray(notifications) && notifications.length > 0
 
     useEffect(() => {
+        setNotifOpen(false)
         if (location.pathname !== '/search') {
             setSearchValue('')
             return
@@ -117,10 +120,42 @@ export default function Layout({ onExportData, onImportData }) {
                                 Backup
                             </button>
                         )}
-                        <button className="layout__notif btn-icon btn-ghost">
-                            <Bell size={18} />
-                            <span className="layout__notif-dot"></span>
-                        </button>
+                        <div className="layout__notif">
+                            <button
+                                className="btn-icon btn-ghost layout__notif-btn"
+                                onClick={() => hasNotifications && setNotifOpen(o => !o)}
+                                title={hasNotifications ? 'Thông báo' : 'Không có thông báo'}
+                                disabled={!hasNotifications}
+                            >
+                                <Bell size={18} />
+                                {hasNotifications && <span className="layout__notif-dot"></span>}
+                            </button>
+                            {notifOpen && hasNotifications && (
+                                <div className="layout__notif-panel">
+                                    <div className="layout__notif-header">
+                                        <span>Thông báo</span>
+                                        <span className="layout__notif-count">{notifications.length}</span>
+                                    </div>
+                                    <div className="layout__notif-list">
+                                        {notifications.map((n) => (
+                                            <button
+                                                key={n.id}
+                                                className={`layout__notif-item layout__notif-item--${n.type || 'default'}`}
+                                                onClick={() => {
+                                                    setNotifOpen(false)
+                                                    if (n.href) {
+                                                        navigate(n.href)
+                                                    }
+                                                }}
+                                            >
+                                                <div className="layout__notif-item-title">{n.title}</div>
+                                                <div className="layout__notif-item-msg">{n.message}</div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         <button
                             className="layout__avatar"
                             onClick={goToAccount}

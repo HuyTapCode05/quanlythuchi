@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout/Layout'
 import Dashboard from './pages/Dashboard/Dashboard'
@@ -20,6 +21,7 @@ import { useAuth } from './hooks/useAuth'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
 import { exportToDB, importFromDB } from './utils/dbExport'
+import { formatCurrency, formatDateShort } from './utils/helpers'
 
 export default function App() {
     const { isAuthenticated } = useAuth()
@@ -73,6 +75,46 @@ export default function App() {
         replaceAllTransactions,
         getTransactionsSnapshot
     } = useTransactions()
+
+    const notifications = useMemo(() => {
+        const items = []
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        recurring.forEach((r) => {
+            if (!r || r.isActive === 0 || r.isActive === false) return
+            const dateStr = r.nextDate || r.next_date
+            if (!dateStr) return
+            const next = new Date(dateStr)
+            if (Number.isNaN(next.getTime())) return
+            next.setHours(0, 0, 0, 0)
+
+            const diffDays = Math.round((next - today) / (1000 * 60 * 60 * 24))
+            const label = r.note || (r.type === 'income' ? 'Thu định kỳ' : 'Chi định kỳ')
+            const amountText = formatCurrency(r.amount || 0)
+            const dateText = formatDateShort(dateStr)
+
+            if (diffDays < 0) {
+                items.push({
+                    id: `recurring-overdue-${r.id}`,
+                    type: 'recurring-overdue',
+                    title: 'Giao dịch định kỳ đã quá hạn',
+                    message: `${label} (${amountText}) lẽ ra vào ${dateText}.`,
+                    href: '/recurring'
+                })
+            } else if (diffDays <= 3) {
+                items.push({
+                    id: `recurring-soon-${r.id}`,
+                    type: 'recurring-soon',
+                    title: 'Giao dịch định kỳ sắp đến hạn',
+                    message: `${label} (${amountText}) sẽ diễn ra vào ${dateText}.`,
+                    href: '/recurring'
+                })
+            }
+        })
+
+        return items
+    }, [recurring])
 
     const handleExportData = async () => {
         try {
@@ -129,6 +171,7 @@ export default function App() {
                         <Layout
                             onExportData={handleExportData}
                             onImportData={handleImportData}
+                            notifications={notifications}
                         />
                     ) : (
                         <Navigate to="/login" replace />

@@ -13,18 +13,24 @@ const app = express()
 const PORT = process.env.PORT || 3001
 
 // Middleware
-const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'https://huytapcode05.github.io',
-]
+const isAllowedOrigin = (origin) => {
+    if (!origin) return true
+    try {
+        const url = new URL(origin)
+        // local dev
+        if (url.hostname === 'localhost') return true
+        // GitHub Pages (any repo/user)
+        if (url.hostname.endsWith('.github.io')) return true
+        return false
+    } catch {
+        return false
+    }
+}
 
 const corsOptions = {
     origin: (origin, callback) => {
-        // Allow non-browser requests (no Origin) like curl/postman/railway healthchecks
-        if (!origin) return callback(null, true)
-        if (allowedOrigins.includes(origin)) return callback(null, true)
-        return callback(new Error(`CORS blocked for origin: ${origin}`))
+        // Do NOT throw here; returning false avoids crashing preflight and avoids confusing logs.
+        return callback(null, isAllowedOrigin(origin))
     },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

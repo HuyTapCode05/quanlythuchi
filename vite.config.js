@@ -7,8 +7,5 @@ export default defineConfig({
     port: 3000,
     open: true
   },
-  optimizeDeps: {
-    exclude: ['sql.js']
-  },
   base: process.env.NODE_ENV === 'production' ? '/quanlythuchi/' : '/',
 })

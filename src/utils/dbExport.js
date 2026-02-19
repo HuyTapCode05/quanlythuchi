@@ -1,19 +1,11 @@
+import initSqlJs from 'sql.js/dist/sql-wasm.js'
+
 let SQL = null
 
 const initSQL = async () => {
     if (!SQL) {
-        // sql.js ships UMD/CJS in dist; Vite interop can wrap exports in multiple shapes.
-        // Import the UMD bundle directly and resolve init function defensively.
-        const sqlJsModule = await import('sql.js/dist/sql-wasm.js')
-        const initSqlJs =
-            (typeof sqlJsModule?.default?.default === 'function' && sqlJsModule.default.default) ||
-            (typeof sqlJsModule?.default === 'function' && sqlJsModule.default) ||
-            (typeof sqlJsModule?.initSqlJs === 'function' && sqlJsModule.initSqlJs) ||
-            (typeof sqlJsModule === 'function' && sqlJsModule) ||
-            null
-
-        if (!initSqlJs) {
-            console.error('sql.js module export shape:', sqlJsModule)
+        if (typeof initSqlJs !== 'function') {
+            console.error('sql.js initSqlJs export is not a function:', initSqlJs)
             throw new Error('Không thể khởi tạo SQL.js (initSqlJs không phải function).')
         }
 

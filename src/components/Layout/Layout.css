@@ -266,8 +266,11 @@
         display: none;
     }
 
-    .layout__notif {
-        display: none;
+    .layout__notif-panel {
+        right: auto;
+        left: 0;
+        width: calc(100vw - 24px);
+        margin: 0 12px;
     }
 
     .layout__avatar {

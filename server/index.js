@@ -556,8 +556,8 @@ app.post('/api/recurring/send-reminders', async (req, res) => {
                     <tr>
                         <td style="padding:20px 24px 16px 24px;border-bottom:1px solid #1f2937;">
                             <div style="display:flex;align-items:center;">
-                                <div style="width:32px;height:32px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#22c55e);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;margin-right:8px;">
-                                    ₫
+                                <div style="width:32px;height:32px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#22c55e);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;letter-spacing:.5px;margin-right:8px;">
+                                    FT
                                 </div>
                                 <div>
                                     <div style="color:#e5e7eb;font-weight:600;font-size:14px;">FinTrack</div>

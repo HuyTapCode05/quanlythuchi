@@ -480,6 +480,22 @@ app.post('/api/recurring/send-reminders', async (req, res) => {
         const formatAmount = (value) =>
             Number(value || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
 
+        const escapeHtml = (str) =>
+            String(str ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;')
+
+        const getEmailGreetingName = (u) => {
+            const raw = String(u?.name || u?.email || '').trim()
+            if (!raw) return 'bạn'
+            const firstToken = raw.split(/\s+/).filter(Boolean)[0] || raw
+            const shortToken = firstToken.length > 32 ? firstToken.slice(0, 32) : firstToken
+            return escapeHtml(shortToken)
+        }
+
         const formatDateShort = (iso) => {
             if (!iso) return ''
             const d = new Date(iso)
@@ -496,7 +512,7 @@ app.post('/api/recurring/send-reminders', async (req, res) => {
         })
 
         const text = [
-            `Chào ${user.name || user.email},`,
+            `Chào ${String(user?.name || user?.email || 'bạn').trim().split(/\s+/).filter(Boolean)[0] || 'bạn'},`,
             '',
             'Dưới đây là các giao dịch định kỳ sắp đến hạn trong 3 ngày tới:',
             '',
@@ -574,7 +590,7 @@ app.post('/api/recurring/send-reminders', async (req, res) => {
                     </tr>
                     <tr>
                         <td style="padding:20px 24px 8px 24px;color:#e5e7eb;font-size:14px;">
-                            <p style="margin:0 0 8px 0;">Chào ${user.name || user.email},</p>
+                            <p style="margin:0 0 8px 0;">Chào ${getEmailGreetingName(user)},</p>
                             <p style="margin:0 0 12px 0;color:#9ca3af;font-size:13px;line-height:1.6;">
                                 Dưới đây là các <strong>giao dịch định kỳ</strong> của bạn sẽ diễn ra trong <strong>3 ngày tới</strong>.
                                 Bạn có thể kiểm tra lại để đảm bảo số dư tài khoản luôn sẵn sàng.

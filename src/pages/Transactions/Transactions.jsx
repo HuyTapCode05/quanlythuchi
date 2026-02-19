@@ -219,7 +219,7 @@ export default function Transactions({
                     </div>
                 </div>
 
-                <button className="btn btn-primary" onClick={() => { setEditTx(null); setShowModal(true) }}>
+                <button className="btn btn-primary transactions__add-btn" onClick={() => { setEditTx(null); setShowModal(true) }}>
                     <Plus size={16} /> Thêm mới
                 </button>
             </div>
@@ -383,6 +383,15 @@ export default function Transactions({
                     } : null}
                 />
             </Modal>
+
+            {/* Floating Action Button - Mobile */}
+            <button
+                className="transactions__fab"
+                onClick={() => { setEditTx(null); setShowModal(true) }}
+                title="Thêm giao dịch"
+            >
+                <Plus size={24} />
+            </button>
         </div>
     )
 }

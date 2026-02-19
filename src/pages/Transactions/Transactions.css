@@ -12,6 +12,40 @@
     gap: var(--space-md);
 }
 
+.transactions__add-btn {
+    white-space: nowrap;
+}
+
+/* Floating Action Button - Mobile */
+.transactions__fab {
+    display: none;
+    position: fixed;
+    right: 20px;
+    bottom: calc(80px + env(safe-area-inset-bottom));
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: white;
+    border: none;
+    box-shadow: 0 8px 25px rgba(108, 92, 231, 0.35);
+    cursor: pointer;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+}
+
+.transactions__fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(108, 92, 231, 0.45);
+}
+
+.transactions__fab:active {
+    transform: translateY(0);
+}
+
 .transactions__filters {
     display: flex;
     align-items: center;
@@ -186,13 +220,21 @@
         align-items: stretch;
     }
 
+    .transactions__filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-sm);
+    }
+
     .transactions__search {
         max-width: 100%;
+        min-width: 0;
     }
 
     .transactions__filter-select {
         min-width: auto;
-        flex: 1;
+        flex: none;
+        max-width: 100%;
     }
 
     .transactions__table-wrap {
@@ -203,19 +245,36 @@
         display: flex;
     }
 
+    .transactions__add-btn {
+        display: none;
+    }
+
+    .transactions__fab {
+        display: flex;
+    }
+
     .transactions__date-filter {
         width: 100%;
         justify-content: space-between;
         padding: var(--space-sm) var(--space-md);
+        flex-wrap: wrap;
+        gap: var(--space-sm);
     }
 
     .transactions__date-input {
-        width: 42%;
+        width: calc(50% - 10px);
         min-width: 0;
     }
 
     .transactions__date-presets {
         width: 100%;
         gap: var(--space-sm);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+    }
+
+    .transactions__date-presets .btn {
+        flex: 0 0 auto;
     }
 }

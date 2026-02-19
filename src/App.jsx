@@ -10,6 +10,7 @@ import Statistics from './pages/Statistics/Statistics'
 import Categories from './pages/Categories/Categories'
 import Account from './pages/Account/Account'
 import SearchPage from './pages/Search/Search'
+import Backup from './pages/Backup/Backup'
 import { useTransactions } from './hooks/useTransactions'
 import { useCategories } from './hooks/useCategories'
 import { useBudgets } from './hooks/useBudgets'
@@ -242,6 +243,15 @@ export default function App() {
                             addTransaction={addTransaction}
                             updateTransaction={updateTransaction}
                             deleteTransaction={deleteTransaction}
+                        />
+                    }
+                />
+                <Route
+                    path="/backup"
+                    element={
+                        <Backup
+                            onExportData={handleExportData}
+                            onRestoreData={handleImportData}
                         />
                     }
                 />

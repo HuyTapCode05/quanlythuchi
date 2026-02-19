@@ -12,6 +12,7 @@ const pageTitles = {
     '/transactions': 'Giao dịch',
     '/categories': 'Danh mục',
     '/search': 'Tìm kiếm',
+    '/backup': 'Backup / Restore',
 }
 
 export default function Layout({ onExportData, onImportData }) {
@@ -52,28 +53,8 @@ export default function Layout({ onExportData, onImportData }) {
         navigate('/account')
     }
 
-    const handleClickImport = () => {
-        if (!onImportData) return
-        fileInputRef.current?.click()
-    }
-
-    const handleFileChange = (e) => {
-        const file = e.target.files?.[0]
-        if (!file || !onImportData) return
-        const reader = new FileReader()
-        reader.onload = async (event) => {
-            try {
-                const arrayBuffer = event.target?.result
-                await onImportData(arrayBuffer)
-                alert('Đã import dữ liệu từ file database.')
-            } catch (error) {
-                console.error('Import error:', error)
-                alert('File không hợp lệ, vui lòng chọn đúng file .db từ FinTrack.')
-            } finally {
-                e.target.value = ''
-            }
-        }
-        reader.readAsArrayBuffer(file)
+    const goToBackup = () => {
+        navigate('/backup')
     }
 
     return (
@@ -132,28 +113,9 @@ export default function Layout({ onExportData, onImportData }) {
                             )}
                         </button>
                         {onExportData && (
-                            <>
-                                <button
-                                    className="btn btn-secondary btn-sm"
-                                    style={{ marginRight: '8px' }}
-                                    onClick={onExportData}
-                                >
-                                    Xuất DB
-                                </button>
-                                <button
-                                    className="btn btn-ghost btn-sm"
-                                    onClick={handleClickImport}
-                                >
-                                    Nhập DB
-                                </button>
-                                <input
-                                    type="file"
-                                    accept=".db,application/x-sqlite3"
-                                    ref={fileInputRef}
-                                    style={{ display: 'none' }}
-                                    onChange={handleFileChange}
-                                />
-                            </>
+                            <button className="btn btn-secondary btn-sm" onClick={goToBackup}>
+                                Backup
+                            </button>
                         )}
                         <button className="layout__notif btn-icon btn-ghost">
                             <Bell size={18} />

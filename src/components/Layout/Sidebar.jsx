@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import {
     LayoutDashboard, TrendingUp, TrendingDown, Tag, ChevronLeft,
-    ChevronRight, Wallet, Target, Repeat, PiggyBank, BarChart3, Search
+    ChevronRight, Wallet, Target, Repeat, PiggyBank, BarChart3, Search, HardDriveDownload
 } from 'lucide-react'
 import './Sidebar.css'
 
@@ -15,6 +15,7 @@ const menuItems = [
     { path: '/savings', icon: PiggyBank, label: 'Tiết kiệm' },
     { path: '/statistics', icon: BarChart3, label: 'Thống kê' },
     { path: '/categories', icon: Tag, label: 'Danh mục' },
+    { path: '/backup', icon: HardDriveDownload, label: 'Backup / Restore' },
 ]
 
 export default function Sidebar({ collapsed, mobileOpen, onToggle, onMobileClose }) {

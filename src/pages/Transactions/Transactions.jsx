@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { Plus, Search, Pencil, Trash2, Filter, Calendar, X } from 'lucide-react'
 import Modal from '../../components/Modal'
 import TransactionForm from '../../components/TransactionForm'
@@ -7,15 +7,28 @@ import './Transactions.css'
 
 const ITEMS_PER_PAGE = 10
 
-export default function Transactions({ transactions, categories, addTransaction, updateTransaction, deleteTransaction }) {
+export default function Transactions({
+    transactions,
+    categories,
+    addTransaction,
+    updateTransaction,
+    deleteTransaction,
+    initialSearch = '',
+    mode = 'transactions',
+}) {
     const [showModal, setShowModal] = useState(false)
     const [editTx, setEditTx] = useState(null)
-    const [search, setSearch] = useState('')
+    const [search, setSearch] = useState(initialSearch)
     const [filterType, setFilterType] = useState('all')
     const [filterCat, setFilterCat] = useState('all')
     const [dateFrom, setDateFrom] = useState('')
     const [dateTo, setDateTo] = useState('')
     const [page, setPage] = useState(1)
+
+    useEffect(() => {
+        setSearch(initialSearch || '')
+        setPage(1)
+    }, [initialSearch])
 
     const getCat = (id) => categories.find(c => c.id === id)
 

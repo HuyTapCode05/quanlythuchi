@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Menu, Search, Bell, Sun, Moon, Monitor } from 'lucide-react'
 import Sidebar from './Sidebar'
@@ -11,11 +11,13 @@ const pageTitles = {
     '/': 'Tổng quan',
     '/transactions': 'Giao dịch',
     '/categories': 'Danh mục',
+    '/search': 'Tìm kiếm',
 }
 
 export default function Layout({ onExportData, onImportData }) {
     const [collapsed, setCollapsed] = useState(false)
     const [mobileOpen, setMobileOpen] = useState(false)
+    const [searchValue, setSearchValue] = useState('')
     const { user, logout } = useAuth()
     const { theme, toggleTheme } = useTheme()
     const navigate = useNavigate()
@@ -23,6 +25,21 @@ export default function Layout({ onExportData, onImportData }) {
     const location = useLocation()
 
     const title = pageTitles[location.pathname] || 'FinTrack'
+
+    useEffect(() => {
+        if (location.pathname !== '/search') {
+            setSearchValue('')
+            return
+        }
+        const params = new URLSearchParams(location.search || '')
+        setSearchValue(params.get('q') || '')
+    }, [location.pathname, location.search])
+
+    const goSearch = () => {
+        const q = (searchValue || '').trim()
+        if (!q) return navigate('/search')
+        navigate(`/search?q=${encodeURIComponent(q)}`)
+    }
 
     const handleLogout = () => {
         if (confirm('Đăng xuất khỏi tài khoản hiện tại?')) {
@@ -94,6 +111,11 @@ export default function Layout({ onExportData, onImportData }) {
                                 type="text"
                                 placeholder="Tìm kiếm..."
                                 className="layout__search-input"
+                                value={searchValue}
+                                onChange={(e) => setSearchValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') goSearch()
+                                }}
                             />
                         </div>
                         <button

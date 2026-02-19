@@ -555,15 +555,21 @@ app.post('/api/recurring/send-reminders', async (req, res) => {
                 <table width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;background:#020617;border-radius:16px;border:1px solid #1f2937;box-shadow:0 12px 45px rgba(15,23,42,.7);overflow:hidden;">
                     <tr>
                         <td style="padding:20px 24px 16px 24px;border-bottom:1px solid #1f2937;">
-                            <div style="display:flex;align-items:center;">
-                                <div style="width:32px;height:32px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#22c55e);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;letter-spacing:.5px;margin-right:8px;">
-                                    FT
-                                </div>
-                                <div>
-                                    <div style="color:#e5e7eb;font-weight:600;font-size:14px;">FinTrack</div>
-                                    <div style="color:#9ca3af;font-size:11px;">Nhắc nhở giao dịch định kỳ</div>
-                                </div>
-                            </div>
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
+                                <tr>
+                                    <td align="center">
+                                        <div style="width:32px;height:32px;border-radius:999px;background:linear-gradient(135deg,#6366f1,#22c55e);display:inline-block;line-height:32px;text-align:center;color:#fff;font-weight:800;font-size:14px;letter-spacing:.5px;">
+                                            FT
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-top:8px;">
+                                        <div style="color:#e5e7eb;font-weight:600;font-size:14px;line-height:1.2;">FinTrack</div>
+                                        <div style="color:#9ca3af;font-size:11px;line-height:1.2;">Nhắc nhở giao dịch định kỳ</div>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                     <tr>

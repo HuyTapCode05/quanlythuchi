@@ -227,7 +227,7 @@ export default function Transactions({
             {/* Table */}
             {paginated.length > 0 ? (
                 <>
-                    <div className="table-container animate-fade-in-up">
+                    <div className="table-container animate-fade-in-up transactions__table-wrap">
                         <table className="table">
                             <thead>
                                 <tr>
@@ -277,6 +277,53 @@ export default function Transactions({
                                 })}
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Mobile Cards */}
+                    <div className="transactions__mobile-list">
+                        {paginated.map(tx => {
+                            const cat = getCat(tx.category)
+                            const isIncome = tx.type === 'income'
+                            return (
+                                <div
+                                    key={tx.id}
+                                    className={`transactions__mobile-card ${isIncome ? 'transactions__mobile-card--income' : 'transactions__mobile-card--expense'}`}
+                                >
+                                    <div className="transactions__mobile-top">
+                                        <div className="transactions__mobile-cat">
+                                            <span className="category-tag">
+                                                <span className="category-tag__dot" style={{ background: cat?.color || '#9d9dba' }}></span>
+                                                {cat ? `${cat.icon} ${cat.name}` : 'Không rõ'}
+                                            </span>
+                                            <span className={`badge ${isIncome ? 'badge-income' : 'badge-expense'}`}>
+                                                {isIncome ? 'Thu' : 'Chi'}
+                                            </span>
+                                        </div>
+                                        <div className={`transactions__mobile-amount ${isIncome ? 'text-income' : 'text-expense'}`}>
+                                            {isIncome ? '+' : '-'}{formatCurrency(tx.amount)}
+                                        </div>
+                                    </div>
+
+                                    <div className="transactions__mobile-mid">
+                                        <div className="transactions__mobile-note text-secondary">
+                                            {tx.note || '—'}
+                                        </div>
+                                        <div className="transactions__mobile-date text-secondary">
+                                            {formatDate(tx.createdAt)}
+                                        </div>
+                                    </div>
+
+                                    <div className="transactions__mobile-actions">
+                                        <button className="btn btn-secondary btn-sm" onClick={() => handleEdit(tx)}>
+                                            <Pencil size={15} /> Sửa
+                                        </button>
+                                        <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(tx.id)} style={{ color: 'var(--danger)' }}>
+                                            <Trash2 size={15} /> Xóa
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
 
                     {/* Pagination */}
